@@ -1,0 +1,126 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\\uBC94\uD55C\\bhm-LDWS\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-ldws\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|e:\\\uBC94\uD55C\\bhm-ldws\\bhm-ldws\\udsclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\udsclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-ldws\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:135:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "bhm-LDWS\\MainWindow.xaml",
+              "ToolTip": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml",
+              "RelativeToolTip": "bhm-LDWS\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-05T03:23:03.949Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "bhm-LDWS\\MainWindow.xaml.cs",
+              "ToolTip": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml.cs",
+              "RelativeToolTip": "bhm-LDWS\\MainWindow.xaml.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAADwvywAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-05T03:23:05.674Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "UDSClient.cs",
+              "DocumentMoniker": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\UDSClient.cs",
+              "RelativeDocumentMoniker": "bhm-LDWS\\UDSClient.cs",
+              "ToolTip": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\UDSClient.cs",
+              "RelativeToolTip": "bhm-LDWS\\UDSClient.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAADwvykAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-05T03:22:58.768Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{004be353-6879-467c-9d1e-9ac23cdf6d49}"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

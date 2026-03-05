@@ -1,0 +1,86 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\\uBC94\uD55C\\bhm-LDWS\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|d:\\\uBC94\uD55C\\bhm-ldws\\bhm-ldws\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|d:\\\uBC94\uD55C\\bhm-ldws\\bhm-ldws\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|d:\\\uBC94\uD55C\\bhm-ldws\\bhm-ldws\\udsclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\udsclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{57d563b6-44a5-47df-85be-f4199ad6b651}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:135:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "D:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "bhm-LDWS\\MainWindow.xaml",
+              "ToolTip": "D:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml",
+              "RelativeToolTip": "bhm-LDWS\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-06T00:30:14.969Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "D:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "bhm-LDWS\\MainWindow.xaml.cs",
+              "ToolTip": "D:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml.cs",
+              "RelativeToolTip": "bhm-LDWS\\MainWindow.xaml.cs",
+              "ViewState": "AgIAACkBAAAAAAAAAAAAADwBAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-06T00:30:19.021Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UDSClient.cs",
+              "DocumentMoniker": "D:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\UDSClient.cs",
+              "RelativeDocumentMoniker": "bhm-LDWS\\UDSClient.cs",
+              "ToolTip": "D:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\UDSClient.cs",
+              "RelativeToolTip": "bhm-LDWS\\UDSClient.cs",
+              "ViewState": "AgIAAE8BAAAAAAAAAAAcwOwAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-06T00:29:59.412Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

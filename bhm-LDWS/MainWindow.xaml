@@ -1,0 +1,117 @@
+<Window x:Class="KI_RnB.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PAEB &amp; LDWS" Height="750" Width="950">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="PAEB &amp; LDWS UDS"
+                   FontSize="20" FontWeight="Bold"
+                   Margin="0,0,0,15"/>
+
+        <!-- Static Calibration (EOL) 구역 - Camera -->
+        <GroupBox Grid.Row="1" Header="Static EOL (Camera)" Margin="0,0,0,10" Padding="10">
+            <StackPanel>
+                <WrapPanel>
+                    <Button x:Name="btnExtendedSession" Content="1. Extended Session"
+                            Width="140" Height="40" Margin="5" Click="btnExtendedSession_Click"/>
+                    <Button x:Name="btnDtcCheck" Content="2. DTC Check"
+                            Width="140" Height="40" Margin="5" Click="btnDtcCheck_Click"/>
+                    <Button x:Name="btnSecurityAccess" Content="3. Security Access"
+                            Width="140" Height="40" Margin="5" Click="btnSecurityAccess_Click"/>
+                    <Button x:Name="btnCloseTarget" Content="4. Close Target"
+                            Width="140" Height="40" Margin="5" Click="btnCloseTarget_Click"/>
+                    <Button x:Name="btnHeartbeat" Content="5. Heartbeat"
+                            Width="140" Height="40" Margin="5" Click="btnHeartbeat_Click"/>
+                    <Button x:Name="btnFarTarget" Content="6. Far Target"
+                            Width="140" Height="40" Margin="5" Click="btnFarTarget_Click"/>
+                    <Button x:Name="btnStaticEcuReset" Content="7. ECU Reset"
+                            Width="140" Height="40" Margin="5" Click="btnStaticEcuReset_Click"/>
+                    <Button x:Name="btnStaticReadResult" Content="8. Read Result"
+                            Width="140" Height="40" Margin="5" Click="btnStaticReadResult_Click"/>
+                    <Button x:Name="btnStaticClearDtc" Content="9. Clear DTC"
+                            Width="140" Height="40" Margin="5" Click="btnStaticClearDtc_Click"/>
+                    <Button x:Name="btnFinalDtcCheck" Content="10. Final DTC Check"
+                            Width="140" Height="40" Margin="5" Click="btnFinalDtcCheck_Click"/>
+                </WrapPanel>
+                <Button x:Name="btnStaticAll" Content="▶ Run All (Static Calibration EOL)"
+                        Height="35" Margin="5,10,5,0" Background="#4CAF50" Foreground="White" FontWeight="Bold"
+                        Click="btnStaticAll_Click"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Dynamic Calibration 구역 -->
+        <GroupBox Grid.Row="2" Header="Dynamic (Camera)" Margin="0,0,0,10" Padding="10">
+            <StackPanel>
+                <WrapPanel>
+                    <Button x:Name="btnDynExtendedSession" Content="1. Extended Session"
+                            Width="140" Height="40" Margin="5" Click="btnDynExtendedSession_Click"/>
+                    <Button x:Name="btnDynSecurityAccess" Content="2. Security Access"
+                            Width="140" Height="40" Margin="5" Click="btnDynSecurityAccess_Click"/>
+                    <Button x:Name="btnVehicleDataWrite" Content="3. Vehicle Data Write"
+                            Width="140" Height="40" Margin="5" Click="btnVehicleDataWrite_Click"/>
+                    <Button x:Name="btnDynEcuReset1" Content="4. ECU Reset"
+                            Width="140" Height="40" Margin="5" Click="btnDynEcuReset1_Click"/>
+                    <Button x:Name="btnDynamicCalibration" Content="5. Dynamic Calib"
+                            Width="140" Height="40" Margin="5" Click="btnDynamicCalibration_Click"/>
+                    <Button x:Name="btnDynEcuReset2" Content="6. ECU Reset"
+                            Width="140" Height="40" Margin="5" Click="btnDynEcuReset2_Click"/>
+                    <Button x:Name="btnDynamicReadResult" Content="7. Read Result"
+                            Width="140" Height="40" Margin="5" Click="btnDynamicReadResult_Click"/>
+                    <Button x:Name="btnDynamicClearDtc" Content="8. Clear DTC"
+                            Width="140" Height="40" Margin="5" Click="btnDynamicClearDtc_Click"/>
+                </WrapPanel>
+                <Button x:Name="btnDynamicAll" Content="▶ Run All (Dynamic Calibration)"
+                        Height="35" Margin="5,10,5,0" Background="#2196F3" Foreground="White" FontWeight="Bold"
+                        Click="btnDynamicAll_Click"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Radar EOL Calibration 구역 (Y526316 문서 기준) -->
+        <GroupBox Grid.Row="3" Header="Radar EOL (Y526316)" Margin="0,0,0,10" Padding="10">
+            <StackPanel>
+                <WrapPanel>
+                    <Button x:Name="btnRadarExtendedSession" Content="1. Extended Session"
+                            Width="140" Height="40" Margin="5" Click="btnRadarExtendedSession_Click"/>
+                    <Button x:Name="btnRadarDtcCheck" Content="2. DTC Check"
+                            Width="140" Height="40" Margin="5" Click="btnRadarDtcCheck_Click"/>
+                    <Button x:Name="btnRadarEOLAlignment" Content="3. EOL Alignment"
+                            Width="140" Height="40" Margin="5" Click="btnRadarEOLAlignment_Click"/>
+                    <Button x:Name="btnRadarEcuReset" Content="4. ECU Reset"
+                            Width="140" Height="40" Margin="5" Click="btnRadarEcuReset_Click"/>
+                    <Button x:Name="btnRadarReadAlignData" Content="5. Read Align Data"
+                            Width="140" Height="40" Margin="5" Click="btnRadarReadAlignData_Click"/>
+                    <Button x:Name="btnRadarClearDtc" Content="6. Clear DTC"
+                            Width="140" Height="40" Margin="5" Click="btnRadarClearDtc_Click"/>
+                    <Button x:Name="btnRadarFinalDtcCheck" Content="7. Final DTC Check"
+                            Width="140" Height="40" Margin="5" Click="btnRadarFinalDtcCheck_Click"/>
+                </WrapPanel>
+                <Button x:Name="btnRadarAll" Content="▶ Run All (Radar EOL)"
+                        Height="35" Margin="5,10,5,0" Background="#FF5722" Foreground="White" FontWeight="Bold"
+                        Click="btnRadarAll_Click"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Log 영역 -->
+        <TextBox x:Name="txtLog" Grid.Row="5"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 IsReadOnly="True"
+                 Background="#F5F5F5"
+                 FontFamily="Consolas"/>
+
+        <Button Grid.Row="6" Content="Clear Log"
+                HorizontalAlignment="Right" Width="100"
+                Margin="0,10,0,0"
+                Click="btnClearLog_Click"/>
+    </Grid>
+</Window>
