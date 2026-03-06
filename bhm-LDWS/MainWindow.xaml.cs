@@ -9,6 +9,7 @@ namespace KI_RnB
     public partial class MainWindow : Window
     {
         private UDSClient _client;
+        private Logger _logger;
 
         public MainWindow()
         {
@@ -17,7 +18,14 @@ namespace KI_RnB
             try
             {
                 _client = new UDSClient();
+
+                // 앱 시작 시 자동으로 로깅 세션 시작
+                _logger = new Logger();
+                _logger.StartSession("ECU_Test_Session");
+                _client.Logger = _logger;
+
                 AppendLog("UDS Client initialized successfully.");
+                AppendLog($"[Log] Session started: {_logger.LogFilePath}");
             }
             catch (Exception ex)
             {
@@ -252,6 +260,7 @@ namespace KI_RnB
         {
             btnStaticAll.IsEnabled = false;
             AppendLog("=== [Camera] Starting Static Calibration (EOL) - Full Sequence ===");
+            _logger?.LogStep("[Camera] Static Calibration (EOL) - Start");
 
             try
             {
@@ -259,10 +268,12 @@ namespace KI_RnB
                 byte[] vehicleData = GetVehicleDataFromUI();
                 await Task.Run(() => _client.CameraStaticCalibrationEOL(vehicleData));
                 AppendLog("=== [Camera] Static Calibration (EOL) completed ===");
+                _logger?.LogInfo("[Camera] Static Calibration (EOL) - Completed Successfully");
             }
             catch (Exception ex)
             {
                 AppendLog($"[Camera] Static Calibration error: {ex.Message}");
+                _logger?.LogError(ex.Message);
             }
             finally
             {
@@ -448,6 +459,7 @@ namespace KI_RnB
         {
             btnDynamicAll.IsEnabled = false;
             AppendLog("=== [Camera] Starting Dynamic Calibration - Full Sequence ===");
+            _logger?.LogStep("[Camera] Dynamic Calibration - Start");
 
             try
             {
@@ -455,10 +467,12 @@ namespace KI_RnB
                 byte[] vehicleData = GetVehicleDataFromUI();
                 await Task.Run(() => _client.CameraDynamicCalibration(vehicleData));
                 AppendLog("=== [Camera] Dynamic Calibration completed ===");
+                _logger?.LogInfo("[Camera] Dynamic Calibration - Completed Successfully");
             }
             catch (Exception ex)
             {
                 AppendLog($"[Camera] Dynamic Calibration error: {ex.Message}");
+                _logger?.LogError(ex.Message);
             }
             finally
             {
@@ -623,16 +637,19 @@ namespace KI_RnB
         {
             btnRadarAll.IsEnabled = false;
             AppendLog("=== [Radar] Starting Radar EOL Test - Full Sequence ===");
+            _logger?.LogStep("[Radar] EOL Test - Start");
 
             try
             {
                 _client.CurrentEcuType = EcuType.Radar;
                 await Task.Run(() => _client.RadarEOLTest());
                 AppendLog("=== [Radar] Radar EOL Test completed ===");
+                _logger?.LogInfo("[Radar] EOL Test - Completed Successfully");
             }
             catch (Exception ex)
             {
                 AppendLog($"[Radar] Radar EOL Test error: {ex.Message}");
+                _logger?.LogError(ex.Message);
             }
             finally
             {
@@ -665,6 +682,13 @@ namespace KI_RnB
 
         protected override void OnClosed(EventArgs e)
         {
+            // 앱 종료 시 자동으로 로깅 세션 종료
+            if (_logger != null)
+            {
+                _logger.EndSession(true);
+                _logger.Dispose();
+            }
+
             _client?.Dispose();
             base.OnClosed(e);
         }

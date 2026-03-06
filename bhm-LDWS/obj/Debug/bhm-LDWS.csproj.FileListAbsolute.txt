@@ -26,3 +26,4 @@ E:\범한\bhm-LDWS\bhm-LDWS\obj\Debug\bhm-LDWS.csproj.GenerateResource.cache
 E:\범한\bhm-LDWS\bhm-LDWS\obj\Debug\bhm-LDWS.csproj.CoreCompileInputs.cache
 E:\범한\bhm-LDWS\bhm-LDWS\obj\Debug\bhm-LDWS.exe
 E:\범한\bhm-LDWS\bhm-LDWS\obj\Debug\bhm-LDWS.pdb
+E:\범한\bhm-LDWS\bhm-LDWS\obj\Debug\bhm-LDWS.exe.config
