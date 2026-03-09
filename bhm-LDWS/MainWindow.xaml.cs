@@ -685,14 +685,28 @@ namespace KI_RnB
 
         protected override void OnClosed(EventArgs e)
         {
-            // 앱 종료 시 자동으로 로깅 세션 종료
-            if (_logger != null)
+            try
             {
-                _logger.EndSession(true);
-                _logger.Dispose();
+                // 앱 종료 시 자동으로 로깅 세션 종료
+                if (_logger != null)
+                {
+                    _logger.EndSession(true);
+                    _logger.Dispose();
+                    _logger = null;
+                }
+
+                // 장치 정리 (UDSClient.Dispose에서 ClosePort 호출)
+                if (_client != null)
+                {
+                    _client.Dispose();
+                    _client = null;
+                }
+            }
+            catch
+            {
+                // 종료 시 예외 무시
             }
 
-            _client?.Dispose();
             base.OnClosed(e);
         }
     }

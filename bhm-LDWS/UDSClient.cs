@@ -167,35 +167,53 @@ namespace bhm_LDWS
         public virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
+            _disposed = true;
 
             if (disposing)
             {
+                // 1. 타이머 중지
                 if (_heartbeatTimer != null)
                 {
                     _heartbeatTimer.Dispose();
                     _heartbeatTimer = null;
                 }
-            }
 
-            // COM 스레드에서 장치 닫기
-            if (hObject != IntPtr.Zero)
-            {
-                try
+                // 2. COM 스레드에서 장치 닫기
+                if (hObject != IntPtr.Zero && _comQueue != null && !_comQueue.IsAddingCompleted)
                 {
-                    RunOnComThread(() =>
+                    try
                     {
-                        int errors = 0;
-                        icsNeoDll.icsneoClosePort(hObject, ref errors);
-                        hObject = IntPtr.Zero;
-                    });
+                        RunOnComThread(() =>
+                        {
+                            if (hObject != IntPtr.Zero)
+                            {
+                                int errors = 0;
+                                icsNeoDll.icsneoClosePort(hObject, ref errors);
+                                icsNeoDll.icsneoFreeObject(hObject);
+                                hObject = IntPtr.Zero;
+                            }
+                        });
+                    }
+                    catch { }
                 }
-                catch { }
+
+                // 3. COM 스레드 큐 종료
+                if (_comQueue != null && !_comQueue.IsAddingCompleted)
+                {
+                    _comQueue.CompleteAdding();
+                }
+
+                // 4. COM 스레드가 종료될 때까지 대기
+                if (_comThread != null && _comThread.IsAlive)
+                {
+                    _comThread.Join(1000);  // 최대 1초 대기
+                }
+
+                // 5. 큐 해제
+                _comQueue?.Dispose();
+                _comQueue = null;
             }
-
-            // COM 스레드 종료
-            _comQueue?.CompleteAdding();
-
-            _disposed = true;
+            // finalizer (disposing=false)에서는 관리 객체 접근 금지
         }
 
         ~UDSClient()
@@ -210,6 +228,19 @@ namespace bhm_LDWS
         // CSnet1과 완전히 동일한 OpenDevice
         public void OpenDevice()
         {
+            // 기존 핸들이 있으면 먼저 정리
+            if (hObject != IntPtr.Zero)
+            {
+                try
+                {
+                    int errors = 0;
+                    icsNeoDll.icsneoClosePort(hObject, ref errors);
+                    icsNeoDll.icsneoFreeObject(hObject);
+                }
+                catch { }
+                hObject = IntPtr.Zero;
+            }
+
             NeoDeviceEx[] ndNeoToOpenEx = new NeoDeviceEx[16];
             NeoDevice ndNeoToOpen;
             OptionsNeoEx neoDeviceOption = new OptionsNeoEx();
