@@ -1,6 +1,7 @@
 using KI_RnB;
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,13 @@ namespace bhm_LDWS
         private bool _disposed = false;
         private Timer _heartbeatTimer;
 
+        // COM 스레드 안전을 위한 전용 STA 스레드
+        private Thread _comThread;
+        private BlockingCollection<Action> _comQueue = new BlockingCollection<Action>();
+
+        // CSnet1과 동일: 메시지 버퍼 20000개
+        private icsSpyMessage[] stMessages = new icsSpyMessage[20000];
+
         // Logger for TX/RX logging
         private Logger _logger;
         public Logger Logger
@@ -31,10 +39,13 @@ namespace bhm_LDWS
             set => _logger = value;
         }
 
+        // UI 로그 콜백 (MainWindow에서 설정)
+        public Action<string> OnLog { get; set; }
+
         // Camera CAN IDs (29-bit extended, J1939) - Security Access 문서 기준
         // "Request on CAN Id 0x18 DA E8 xx" → ECU=0xE8, Tester=0xF0
-        private const uint CameraTesterID = 0x18DAE8F0;
-        private const uint CameraEcuID = 0x18DAF0E8;
+        private const uint CameraTesterID = 0x18DA2AF1;  // 0x18DAE8F0;
+        private const uint CameraEcuID = 0x18DAF12A;  // 0x18DAF0E8;
 
         // Radar CAN IDs (29-bit extended, J1939) - Y526316 문서 Page 2 기준
         // "if the tester source address is 0xF0, ECU source address is 0x2A and the priority is 6,
@@ -60,8 +71,91 @@ namespace bhm_LDWS
 
         public UDSClient()
         {
-            OpenDevice();
+            // COM 전용 STA 스레드 시작
+            _comThread = new Thread(ComThreadLoop);
+            _comThread.SetApartmentState(ApartmentState.STA);
+            _comThread.IsBackground = true;
+            _comThread.Start();
+
+            // COM 스레드에서 장치 열기
+            RunOnComThread(() => OpenDevice());
+
             _heartbeatTimer = new Timer(_ => SendHeartbeat(), null, Timeout.Infinite, Timeout.Infinite);
+        }
+
+        // COM 스레드 루프
+        private void ComThreadLoop()
+        {
+            foreach (var action in _comQueue.GetConsumingEnumerable())
+            {
+                try { action(); }
+                catch { /* 에러 무시 */ }
+            }
+        }
+
+        // COM 스레드에서 작업 실행 (동기)
+        private void RunOnComThread(Action action)
+        {
+            if (Thread.CurrentThread == _comThread)
+            {
+                action();
+                return;
+            }
+
+            var tcs = new TaskCompletionSource<bool>();
+            _comQueue.Add(() =>
+            {
+                try
+                {
+                    action();
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            try
+            {
+                tcs.Task.Wait();
+            }
+            catch (AggregateException ae)
+            {
+                throw ae.InnerException ?? ae;
+            }
+        }
+
+        // COM 스레드에서 작업 실행 (반환값 있음)
+        private T RunOnComThread<T>(Func<T> func)
+        {
+            if (Thread.CurrentThread == _comThread)
+            {
+                return func();
+            }
+
+            var tcs = new TaskCompletionSource<T>();
+            _comQueue.Add(() =>
+            {
+                try
+                {
+                    tcs.SetResult(func());
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            try
+            {
+                return tcs.Task.Result;
+            }
+            catch (AggregateException ae)
+            {
+                // 원본 예외를 던짐
+                throw ae.InnerException ?? ae;
+            }
         }
 
         public void Dispose()
@@ -83,13 +177,23 @@ namespace bhm_LDWS
                 }
             }
 
+            // COM 스레드에서 장치 닫기
             if (hObject != IntPtr.Zero)
             {
-                int errors = 0;
-                icsNeoDll.icsneoClosePort(hObject, ref errors);
-                Console.WriteLine($"Port closed with {errors} errors");
-                hObject = IntPtr.Zero;
+                try
+                {
+                    RunOnComThread(() =>
+                    {
+                        int errors = 0;
+                        icsNeoDll.icsneoClosePort(hObject, ref errors);
+                        hObject = IntPtr.Zero;
+                    });
+                }
+                catch { }
             }
+
+            // COM 스레드 종료
+            _comQueue?.CompleteAdding();
 
             _disposed = true;
         }
@@ -103,28 +207,34 @@ namespace bhm_LDWS
 
         #region Device & Communication Core
 
+        // CSnet1과 완전히 동일한 OpenDevice
         public void OpenDevice()
         {
-            NeoDevice neoDevice = new NeoDevice();
-            int numDevices = 1;
-            uint deviceTypes = (uint)eHardwareTypes.NEODEVICE_ALL;
+            NeoDeviceEx[] ndNeoToOpenEx = new NeoDeviceEx[16];
+            NeoDevice ndNeoToOpen;
+            OptionsNeoEx neoDeviceOption = new OptionsNeoEx();
+            int iNumberOfDevices = 15;
 
-            if (icsNeoDll.icsneoFindNeoDevices(deviceTypes, ref neoDevice, ref numDevices) == 0)
+            // CSnet1: byte[255] 배열에 0~254 값 채우기
+            byte[] bNetwork = new byte[255];
+            for (int i = 0; i < 255; i++)
+                bNetwork[i] = (byte)i;
+
+            // CSnet1: icsneoFindDevices 사용
+            int iResult = icsNeoDll.icsneoFindDevices(ref ndNeoToOpenEx[0], ref iNumberOfDevices, 0, 0, ref neoDeviceOption, 0);
+            if (iResult == 0 || iNumberOfDevices < 1)
             {
                 throw new Exception("No neoVI device found");
             }
 
-            byte[] networkIDs = new byte[16];
-            int configRead = 1;
-            int syncToPC = 1;
+            ndNeoToOpen = ndNeoToOpenEx[0].neoDevice;
 
-            if (icsNeoDll.icsneoOpenNeoDevice(ref neoDevice, ref hObject, ref networkIDs[0], configRead, syncToPC) == 0)
+            // CSnet1: configRead=1, syncToPC=0
+            iResult = icsNeoDll.icsneoOpenNeoDevice(ref ndNeoToOpen, ref hObject, ref bNetwork[0], 1, 0);
+            if (iResult == 0)
             {
                 throw new Exception("Failed to open neoVI device");
             }
-
-            icsNeoDll.icsneoEnableNetworkCom(hObject, 1);
-            Console.WriteLine("Device opened successfully");
         }
 
         // 현재 ECU 타입에 따른 Tester CAN ID 반환
@@ -139,23 +249,27 @@ namespace bhm_LDWS
             return _currentEcuType == EcuType.Camera ? CameraEcuID : RadarEcuID;
         }
 
-        // UDS 명령어 전송 (Single / Multi-frame 지원)
+        // CSnet1과 완전히 동일한 TX (COM 스레드에서 실행)
         public byte[] SendUDSCommand(byte[] command, bool expectResponse = true)
         {
-            uint testerID = GetTesterID();
-            // Camera와 Radar 모두 29-bit extended (J1939) 사용
-            bool isExtended = true;
+            return RunOnComThread(() => SendUDSCommandInternal(command, expectResponse));
+        }
 
-            icsSpyMessage txMsg = new icsSpyMessage
-            {
-                ArbIDOrHeader = (int)testerID,
-                NetworkID = (byte)eNETWORK_ID.NETID_HSCAN,
-                Protocol = (byte)ePROTOCOL.SPY_PROTOCOL_CAN,
-                StatusBitField = isExtended
-                    ? (int)(eDATA_STATUS_BITFIELD_1.SPY_STATUS_TX_MSG | eDATA_STATUS_BITFIELD_1.SPY_STATUS_XTD_FRAME)
-                    : (int)eDATA_STATUS_BITFIELD_1.SPY_STATUS_TX_MSG,
-                NumberBytesData = (byte)command.Length
-            };
+        private byte[] SendUDSCommandInternal(byte[] command, bool expectResponse)
+        {
+            uint testerID = GetTesterID();
+            bool isExtended = true;  // 29-bit extended ID
+
+            // CSnet1과 동일: 새 메시지 구조체 생성
+            icsSpyMessage stMessagesTx = new icsSpyMessage();
+
+            // CSnet1과 동일: Extended ID면 XTD_FRAME만, 아니면 0
+            if (isExtended)
+                stMessagesTx.StatusBitField = (int)eDATA_STATUS_BITFIELD_1.SPY_STATUS_XTD_FRAME;
+            else
+                stMessagesTx.StatusBitField = 0;
+
+            stMessagesTx.ArbIDOrHeader = (int)testerID;
 
             if (command.Length <= 7)
             {
@@ -163,10 +277,22 @@ namespace bhm_LDWS
                 byte[] frame = new byte[MaxFrameSize];
                 frame[0] = (byte)command.Length;
                 Array.Copy(command, 0, frame, 1, command.Length);
-                SetMessageData(ref txMsg, frame);
-                icsNeoDll.icsneoTxMessages(hObject, ref txMsg, (int)eNETWORK_ID.NETID_HSCAN, 1);
-                Console.WriteLine($"[{_currentEcuType}] TX Single: {BitConverter.ToString(frame)}");
+
+                // CSnet1과 동일: NumberBytesData와 Data1~8 직접 설정
+                stMessagesTx.NumberBytesData = 8;
+                stMessagesTx.Data1 = frame[0];
+                stMessagesTx.Data2 = frame[1];
+                stMessagesTx.Data3 = frame[2];
+                stMessagesTx.Data4 = frame[3];
+                stMessagesTx.Data5 = frame[4];
+                stMessagesTx.Data6 = frame[5];
+                stMessagesTx.Data7 = frame[6];
+                stMessagesTx.Data8 = frame[7];
+
+                // CSnet1과 동일: icsneoTxMessages(handle, ref msg, networkID, 1)
+                icsNeoDll.icsneoTxMessages(hObject, ref stMessagesTx, (int)eNETWORK_ID.NETID_HSCAN, 1);
                 _logger?.LogTx(testerID, frame);
+                OnLog?.Invoke($"TX >> 0x{testerID:X8} | {BitConverter.ToString(frame)}");
             }
             else
             {
@@ -175,15 +301,24 @@ namespace bhm_LDWS
                 ff[0] = (byte)(0x10 | ((command.Length >> 8) & 0x0F));
                 ff[1] = (byte)(command.Length & 0xFF);
                 Array.Copy(command, 0, ff, 2, 6);
-                SetMessageData(ref txMsg, ff);
-                icsNeoDll.icsneoTxMessages(hObject, ref txMsg, (int)eNETWORK_ID.NETID_HSCAN, 1);
-                Console.WriteLine($"[{_currentEcuType}] TX FF: {BitConverter.ToString(ff)}");
+
+                stMessagesTx.NumberBytesData = 8;
+                stMessagesTx.Data1 = ff[0];
+                stMessagesTx.Data2 = ff[1];
+                stMessagesTx.Data3 = ff[2];
+                stMessagesTx.Data4 = ff[3];
+                stMessagesTx.Data5 = ff[4];
+                stMessagesTx.Data6 = ff[5];
+                stMessagesTx.Data7 = ff[6];
+                stMessagesTx.Data8 = ff[7];
+
+                icsNeoDll.icsneoTxMessages(hObject, ref stMessagesTx, (int)eNETWORK_ID.NETID_HSCAN, 1);
                 _logger?.LogTx(testerID, ff);
+                OnLog?.Invoke($"TX >> 0x{testerID:X8} | {BitConverter.ToString(ff)}");
 
                 // Flow Control 대기
                 byte[] fc = ReceiveSingleFrame(2000);
-
-                if (fc.Length == 0 || fc[0] != 0x30)
+                if (fc == null || fc.Length == 0 || fc[0] != 0x30)
                     throw new Exception("Flow Control not received");
 
                 // Consecutive Frames
@@ -196,13 +331,22 @@ namespace bhm_LDWS
                     cf[0] = sequenceNumber++;
                     int len = Math.Min(7, command.Length - offset);
                     Array.Copy(command, offset, cf, 1, len);
-                    SetMessageData(ref txMsg, cf);
-                    icsNeoDll.icsneoTxMessages(hObject, ref txMsg, (int)eNETWORK_ID.NETID_HSCAN, 1);
-                    Console.WriteLine($"[{_currentEcuType}] TX CF: {BitConverter.ToString(cf)}");
+
+                    stMessagesTx.Data1 = cf[0];
+                    stMessagesTx.Data2 = cf[1];
+                    stMessagesTx.Data3 = cf[2];
+                    stMessagesTx.Data4 = cf[3];
+                    stMessagesTx.Data5 = cf[4];
+                    stMessagesTx.Data6 = cf[5];
+                    stMessagesTx.Data7 = cf[6];
+                    stMessagesTx.Data8 = cf[7];
+
+                    icsNeoDll.icsneoTxMessages(hObject, ref stMessagesTx, (int)eNETWORK_ID.NETID_HSCAN, 1);
                     _logger?.LogTx(testerID, cf);
+                    OnLog?.Invoke($"TX >> 0x{testerID:X8} | {BitConverter.ToString(cf)}");
                     offset += len;
                     if (sequenceNumber > 0x2F) sequenceNumber = 0x20;
-                    Thread.Sleep(50);  // STmin 준수
+                    Thread.Sleep(50);
                 }
             }
 
@@ -211,7 +355,7 @@ namespace bhm_LDWS
             return ReceiveUDSResponse(command[0]);
         }
 
-        // 단일 프레임 수신 (타임아웃 적용, ECU ID 필터링)
+        // CSnet1과 완전히 동일한 RX
         public byte[] ReceiveSingleFrame(int timeoutMs = 2000)
         {
             uint expectedEcuID = GetEcuID();
@@ -219,65 +363,113 @@ namespace bhm_LDWS
 
             while ((DateTime.Now - startTime).TotalMilliseconds < timeoutMs)
             {
+                // CSnet1: icsneoWaitForRxMessagesWithTimeOut 사용
                 int waitResult = icsNeoDll.icsneoWaitForRxMessagesWithTimeOut(hObject, 100);
                 if (waitResult == 0) continue;
 
-                icsSpyMessage rxMsg = new icsSpyMessage();
-                int numMsgs = 1;
-                int errors = 0;
+                // CSnet1과 동일: 배열 버퍼 사용
+                int lNumberOfMessages = 0;
+                int lNumberOfErrors = 0;
 
-                if (icsNeoDll.icsneoGetMessages(hObject, ref rxMsg, ref numMsgs, ref errors) == 0 || numMsgs == 0)
+                // CSnet1과 동일: icsneoGetMessages(handle, ref buffer[0], ref count, ref errors)
+                int lResult = icsNeoDll.icsneoGetMessages(hObject, ref stMessages[0], ref lNumberOfMessages, ref lNumberOfErrors);
+                if (lResult == 0 || lNumberOfMessages == 0)
                     continue;
 
-                // ECU ID 필터링 - 현재 ECU 타입에 맞는 응답만 처리
-                uint receivedID = (uint)rxMsg.ArbIDOrHeader;
-                if (receivedID != expectedEcuID)
+                // CSnet1과 동일: 메시지 순회
+                for (int i = 0; i < lNumberOfMessages; i++)
                 {
-                    Console.WriteLine($"[{_currentEcuType}] Ignored message from 0x{receivedID:X8} (expected 0x{expectedEcuID:X8})");
-                    continue;
+                    uint receivedID = (uint)stMessages[i].ArbIDOrHeader;
+
+                    // TX 메시지 무시 (StatusBitField에 TX_MSG 플래그 확인)
+                    if ((stMessages[i].StatusBitField & (int)eDATA_STATUS_BITFIELD_1.SPY_STATUS_TX_MSG) != 0)
+                        continue;
+
+                    // ECU ID 필터링
+                    if (receivedID != expectedEcuID)
+                        continue;
+
+                    // CSnet1과 동일: Data1~8에서 데이터 추출
+                    byte[] rxData = new byte[stMessages[i].NumberBytesData];
+                    if (rxData.Length >= 1) rxData[0] = stMessages[i].Data1;
+                    if (rxData.Length >= 2) rxData[1] = stMessages[i].Data2;
+                    if (rxData.Length >= 3) rxData[2] = stMessages[i].Data3;
+                    if (rxData.Length >= 4) rxData[3] = stMessages[i].Data4;
+                    if (rxData.Length >= 5) rxData[4] = stMessages[i].Data5;
+                    if (rxData.Length >= 6) rxData[5] = stMessages[i].Data6;
+                    if (rxData.Length >= 7) rxData[6] = stMessages[i].Data7;
+                    if (rxData.Length >= 8) rxData[7] = stMessages[i].Data8;
+
+                    _logger?.LogRx(receivedID, rxData);
+                    OnLog?.Invoke($"RX << 0x{receivedID:X8} | {BitConverter.ToString(rxData)}");
+                    return rxData;
                 }
-
-                byte[] data = GetMessageData(ref rxMsg);
-                byte[] rxData = data.Take(rxMsg.NumberBytesData).ToArray();
-                Console.WriteLine($"[{_currentEcuType}] RX: ArbID 0x{rxMsg.ArbIDOrHeader:X8}, Data {BitConverter.ToString(rxData)}");
-                _logger?.LogRx(receivedID, rxData);
-
-                return rxData;
             }
 
-            Console.WriteLine($"[{_currentEcuType}] Receive timeout after {timeoutMs}ms");
-            throw new TimeoutException($"No message received within {timeoutMs}ms");
+            return null;
         }
 
         // UDS 응답 수신 (Multi-frame 지원) - PCI/SID 제외, 순수 데이터만 반환
         public byte[] ReceiveUDSResponse(byte originalSid)
         {
             byte[] first = ReceiveSingleFrame(5000);
-            if (first.Length == 0) throw new Exception("Empty response");
+            if (first == null || first.Length == 0)
+                throw new Exception("No response received (timeout)");
 
             if ((first[0] & 0xF0) == 0x10)  // First Frame (Multi-frame)
             {
                 int respLen = ((first[0] & 0x0F) << 8) | first[1];
-                List<byte> fullResp = new List<byte>(first.Skip(2));
+                List<byte> fullResp = new List<byte>(first.Skip(2).Take(6));  // FF에서 데이터 6바이트
 
-                // Flow Control 전송
+                // Flow Control 전송 (Raw 프레임으로 직접 전송)
                 byte[] fc = { 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-                SendUDSCommand(fc, false);
-                Console.WriteLine($"[{_currentEcuType}] TX FC: 30 00 00");
+                SendRawFrame(fc);
 
-                // Consecutive Frame 수신
-                while (fullResp.Count < respLen)
+                // 멀티프레임 일괄 수신 (버퍼 손실 방지)
+                uint expectedEcuID = GetEcuID();
+                DateTime startTime = DateTime.Now;
+                int timeoutMs = 5000;
+
+                while (fullResp.Count < respLen && (DateTime.Now - startTime).TotalMilliseconds < timeoutMs)
                 {
-                    byte[] cf = ReceiveSingleFrame(2000);
-                    if ((cf[0] & 0xF0) != 0x20) throw new Exception("Invalid Consecutive Frame");
-                    fullResp.AddRange(cf.Skip(1).TakeWhile(b => b != 0x00));
+                    int waitResult = icsNeoDll.icsneoWaitForRxMessagesWithTimeOut(hObject, 100);
+                    if (waitResult == 0) continue;
+
+                    int lNumberOfMessages = 0;
+                    int lNumberOfErrors = 0;
+                    icsNeoDll.icsneoGetMessages(hObject, ref stMessages[0], ref lNumberOfMessages, ref lNumberOfErrors);
+
+                    // 버퍼의 모든 CF를 한 번에 처리
+                    for (int i = 0; i < lNumberOfMessages && fullResp.Count < respLen; i++)
+                    {
+                        if ((stMessages[i].StatusBitField & (int)eDATA_STATUS_BITFIELD_1.SPY_STATUS_TX_MSG) != 0)
+                            continue;
+                        if ((uint)stMessages[i].ArbIDOrHeader != expectedEcuID)
+                            continue;
+
+                        byte pci = stMessages[i].Data1;
+                        if ((pci & 0xF0) == 0x20)  // Consecutive Frame
+                        {
+                            int remaining = respLen - fullResp.Count;
+                            int bytesToTake = Math.Min(7, remaining);
+                            byte[] cfData = { stMessages[i].Data2, stMessages[i].Data3, stMessages[i].Data4,
+                                              stMessages[i].Data5, stMessages[i].Data6, stMessages[i].Data7, stMessages[i].Data8 };
+                            fullResp.AddRange(cfData.Take(bytesToTake));
+                        }
+                    }
                 }
+
+                if (fullResp.Count < respLen)
+                    throw new Exception($"Multi-frame incomplete: {fullResp.Count}/{respLen} bytes");
 
                 byte[] response = fullResp.ToArray();
                 byte responseSid = response[0];
 
                 if (responseSid == 0x7F)
-                    throw new Exception($"Negative Response: SID={response[1]:X2}, NRC={response[2]:X2}");
+                {
+                    OnLog?.Invoke($"[NRC] Negative Response: SID=0x{response[1]:X2}, NRC=0x{response[2]:X2} ({GetNrcDescription(response[2])})");
+                    return null;
+                }
 
                 if (responseSid != (originalSid + 0x40))
                     throw new Exception($"Invalid Positive Response SID (expected {originalSid + 0x40:X2})");
@@ -290,13 +482,70 @@ namespace bhm_LDWS
                 byte responseSid = first[1];
 
                 if (responseSid == 0x7F)
-                    throw new Exception($"Negative Response: SID={first[2]:X2}, NRC={first[3]:X2}");
+                {
+                    OnLog?.Invoke($"[NRC] Negative Response: SID=0x{first[2]:X2}, NRC=0x{first[3]:X2} ({GetNrcDescription(first[3])})");
+                    return null;
+                }
 
                 if (responseSid != (originalSid + 0x40))
                     throw new Exception($"Invalid Positive Response SID (expected {originalSid + 0x40:X2}, got {responseSid:X2})");
 
                 return first.Skip(2).Take(dataLen - 1).ToArray();
             }
+        }
+
+        // NRC 코드 설명
+        private string GetNrcDescription(byte nrc)
+        {
+            switch (nrc)
+            {
+                case 0x10: return "generalReject";
+                case 0x11: return "serviceNotSupported";
+                case 0x12: return "subFunctionNotSupported";
+                case 0x13: return "incorrectMessageLengthOrInvalidFormat";
+                case 0x14: return "responseTooLong";
+                case 0x21: return "busyRepeatRequest";
+                case 0x22: return "conditionsNotCorrect";
+                case 0x24: return "requestSequenceError";
+                case 0x25: return "noResponseFromSubnetComponent";
+                case 0x26: return "failurePreventsExecutionOfRequestedAction";
+                case 0x31: return "requestOutOfRange";
+                case 0x33: return "securityAccessDenied";
+                case 0x35: return "invalidKey";
+                case 0x36: return "exceededNumberOfAttempts";
+                case 0x37: return "requiredTimeDelayNotExpired";
+                case 0x70: return "uploadDownloadNotAccepted";
+                case 0x71: return "transferDataSuspended";
+                case 0x72: return "generalProgrammingFailure";
+                case 0x73: return "wrongBlockSequenceCounter";
+                case 0x78: return "requestCorrectlyReceivedResponsePending";
+                case 0x7E: return "subFunctionNotSupportedInActiveSession";
+                case 0x7F: return "serviceNotSupportedInActiveSession";
+                default: return $"Unknown (0x{nrc:X2})";
+            }
+        }
+
+        // Raw CAN 프레임 전송 (Flow Control 등 UDS 프레이밍 없이 직접 전송)
+        private void SendRawFrame(byte[] data)
+        {
+            uint testerID = GetTesterID();
+
+            icsSpyMessage stMessagesTx = new icsSpyMessage();
+            stMessagesTx.StatusBitField = (int)eDATA_STATUS_BITFIELD_1.SPY_STATUS_XTD_FRAME;
+            stMessagesTx.ArbIDOrHeader = (int)testerID;
+            stMessagesTx.NumberBytesData = 8;
+            stMessagesTx.Data1 = data.Length > 0 ? data[0] : (byte)0;
+            stMessagesTx.Data2 = data.Length > 1 ? data[1] : (byte)0;
+            stMessagesTx.Data3 = data.Length > 2 ? data[2] : (byte)0;
+            stMessagesTx.Data4 = data.Length > 3 ? data[3] : (byte)0;
+            stMessagesTx.Data5 = data.Length > 4 ? data[4] : (byte)0;
+            stMessagesTx.Data6 = data.Length > 5 ? data[5] : (byte)0;
+            stMessagesTx.Data7 = data.Length > 6 ? data[6] : (byte)0;
+            stMessagesTx.Data8 = data.Length > 7 ? data[7] : (byte)0;
+
+            icsNeoDll.icsneoTxMessages(hObject, ref stMessagesTx, (int)eNETWORK_ID.NETID_HSCAN, 1);
+            _logger?.LogTx(testerID, data);
+            OnLog?.Invoke($"TX >> 0x{testerID:X8} | {BitConverter.ToString(data)}");
         }
 
         public void SetMessageData(ref icsSpyMessage msg, byte[] data)
@@ -329,30 +578,25 @@ namespace bhm_LDWS
         public void EnterExtendedSession()
         {
             SendUDSCommand(new byte[] { 0x10, 0x03 });
-            Console.WriteLine($"[{_currentEcuType}] Extended Session entered");
         }
 
         // DTC Check (0x19 0x02)
         public byte[] CheckDTC()
         {
             byte[] dtcCmd = { 0x19, 0x02, 0xFF };
-            byte[] response = SendUDSCommand(dtcCmd);
-            Console.WriteLine($"[{_currentEcuType}] DTC Check completed - {response.Length} bytes received");
-            return response;
+            return SendUDSCommand(dtcCmd);
         }
 
         // Clear DTC (0x14)
         public void ClearDTC()
         {
             SendUDSCommand(new byte[] { 0x14, 0xFF, 0xFF, 0xFF });
-            Console.WriteLine($"[{_currentEcuType}] DTC cleared");
         }
 
         // ECU Reset (0x11 0x01)
         public void EcuReset()
         {
             SendUDSCommand(new byte[] { 0x11, 0x01 });
-            Console.WriteLine($"[{_currentEcuType}] ECU Reset completed");
         }
 
         // Heartbeat (0x3E 0x80) - Tester Present
@@ -360,7 +604,6 @@ namespace bhm_LDWS
         {
             byte[] hb = { 0x3E, 0x80 };  // SuppressPosRspMsgIndicationBit
             SendUDSCommand(hb, false);
-            Console.WriteLine($"[{_currentEcuType}] Heartbeat sent");
         }
 
         // Heartbeat 타이머 시작/중지
@@ -399,10 +642,8 @@ namespace bhm_LDWS
             uint seed = BitConverter.ToUInt32(seedResp, 1);
 
             // Camera 알고리즘: KEY = (((SEED >> 16) | (SEED << 16)) % 0xC503U)
-            uint swapped = (seed >> 16) | (seed << 16);  // 상위/하위 16비트 swap
+            uint swapped = (seed >> 16) | (seed << 16);
             uint key = swapped % 0xC503U;
-
-            Console.WriteLine($"[Camera] Security: Seed=0x{seed:X8}, Swapped=0x{swapped:X8}, Key=0x{key:X8}");
 
             byte[] keyBytes = BitConverter.GetBytes(key);
             byte[] keyReq = new byte[] { 0x27, 0x02 }.Concat(keyBytes).ToArray();
@@ -410,8 +651,6 @@ namespace bhm_LDWS
 
             if (keyResp.Length < 1 || keyResp[0] != 0x02)
                 throw new Exception($"Security Key failed: {BitConverter.ToString(keyResp)}");
-
-            Console.WriteLine("[Camera] Security Access successful");
         }
 
         // DTC 체크 - 캘리브레이션 전 필수 DTC 확인 (0xA9060C, 0xA9060E가 없어야 함)
@@ -430,13 +669,9 @@ namespace bhm_LDWS
                 uint dtc = (uint)((response[offset] << 16) | (response[offset + 1] << 8) | response[offset + 2]);
 
                 if (dtc == 0xA9060C || dtc == 0xA9060E)
-                {
-                    Console.WriteLine($"[Camera] Calibration blocking DTC detected: 0x{dtc:X6}");
                     return false;
-                }
             }
 
-            Console.WriteLine("[Camera] No blocking DTCs found - OK to calibrate");
             return true;
         }
 
@@ -446,7 +681,6 @@ namespace bhm_LDWS
             SendUDSCommand(new byte[] { 0x31, 0x01, 0xFE, 0x01, 0x00 });  // Start
             SendUDSCommand(new byte[] { 0x31, 0x03, 0xFE, 0x01, 0x00 });  // Result
             SendUDSCommand(new byte[] { 0x31, 0x02, 0xFE, 0x01, 0x00 });  // Stop
-            Console.WriteLine("[Camera] Close Target Calibration completed");
         }
 
         // Far Target Calibration ($FE01, 0x01) - Security Access 필요
@@ -455,7 +689,6 @@ namespace bhm_LDWS
             SendUDSCommand(new byte[] { 0x31, 0x01, 0xFE, 0x01, 0x01 });  // Start
             SendUDSCommand(new byte[] { 0x31, 0x03, 0xFE, 0x01, 0x01 });  // Result
             SendUDSCommand(new byte[] { 0x31, 0x02, 0xFE, 0x01, 0x01 });  // Stop
-            Console.WriteLine("[Camera] Far Target Calibration completed");
         }
 
         // Dynamic Calibration Routine ($FE02) - Security Access 필요
@@ -464,19 +697,15 @@ namespace bhm_LDWS
             SendUDSCommand(new byte[] { 0x31, 0x01, 0xFE, 0x02 });  // Start
             SendUDSCommand(new byte[] { 0x31, 0x03, 0xFE, 0x02 });  // Result
             SendUDSCommand(new byte[] { 0x31, 0x02, 0xFE, 0x02 });  // Stop
-            Console.WriteLine("[Camera] Dynamic Calibration Routine completed");
         }
 
         // Read Calibration Result ($FD11) - Security Access 불필요
         public byte[] CameraReadCalibrationResult()
         {
-            byte[] response = SendUDSCommand(new byte[] { 0x22, 0xFD, 0x11 });
-            Console.WriteLine($"[Camera] Calibration Result ($FD11): {BitConverter.ToString(response)}");
-            return response;
+            return SendUDSCommand(new byte[] { 0x22, 0xFD, 0x11 });
         }
 
         // Vehicle Data Write ($FD10) - Security Access 불필요
-        // 14 bytes: LeftWheel(2) + RightWheel(2) + DistToHead(2) + LateralToCenter(2) + ChasisNumber(4) + CountryCode(1) + Status(1)
         public void CameraVehicleDataWrite(byte[] vehicleData)
         {
             if (vehicleData.Length != 14)
@@ -485,7 +714,6 @@ namespace bhm_LDWS
             byte[] header = new byte[] { 0x2E, 0xFD, 0x10 };
             byte[] writeCmd = header.Concat(vehicleData).ToArray();
             SendUDSCommand(writeCmd);
-            Console.WriteLine("[Camera] Vehicle Data Write completed");
         }
 
         // Camera Static Calibration (EOL) 전체 시퀀스
@@ -537,8 +765,6 @@ namespace bhm_LDWS
             ClearDTC();
             Thread.Sleep(10000);
             CheckDTC();
-
-            Console.WriteLine("=== [Camera] Static Calibration (EOL) completed successfully ===");
         }
 
         // Camera Dynamic Calibration 전체 시퀀스
@@ -586,8 +812,6 @@ namespace bhm_LDWS
             ClearDTC();
             Thread.Sleep(10000);
             CheckDTC();
-
-            Console.WriteLine("=== [Camera] Dynamic Calibration completed successfully ===");
         }
 
         #endregion
@@ -601,60 +825,40 @@ namespace bhm_LDWS
         // ============================================================================
 
         // Radar EOL Alignment ($FFA0) - Security Access 불필요
-        // Y526316 문서 Page 6: "EOL Alignment Routine"
         public bool RadarEOLAlignment()
         {
             SendUDSCommand(new byte[] { 0x31, 0x01, 0xFF, 0xA0 });  // Start
-            Console.WriteLine("[Radar] EOL Alignment started");
-
             byte[] result = SendUDSCommand(new byte[] { 0x31, 0x03, 0xFF, 0xA0 });  // Result
-            // 응답: [SubFunc(03)] + [RID(FFA0)] + [Status]
             bool success = result.Length >= 4 && result[3] == 0x00;
-
-            if (!success && result.Length >= 5)
-            {
-                Console.WriteLine($"[Radar] EOL Alignment failed: ErrorCode=0x{result[4]:X2}");
-            }
-
             SendUDSCommand(new byte[] { 0x31, 0x02, 0xFF, 0xA0 });  // Stop
-            Console.WriteLine($"[Radar] EOL Alignment completed: {(success ? "SUCCESS" : "FAILED")}");
-
             return success;
         }
 
-        // Radar Alignment Data 읽기 ($FEA7) - 48 bytes
+        // Radar Alignment Data 읽기 ($FEA7)
         public byte[] RadarReadAlignmentData()
         {
-            byte[] response = SendUDSCommand(new byte[] { 0x22, 0xFE, 0xA7 });
-            Console.WriteLine($"[Radar] Alignment Data ($FEA7): {BitConverter.ToString(response)}");
-            return response;
+            return SendUDSCommand(new byte[] { 0x22, 0xFE, 0xA7 });
         }
 
         // Radar 전체 EOL 테스트 시퀀스
         public void RadarEOLTest()
         {
-            Console.WriteLine("=== [Radar] Starting EOL Test ===");
-
             // Step 1: Extended Session
             _logger?.LogStep("Step 1: Extended Session");
             EnterExtendedSession();
-            Console.WriteLine("[Radar] Step 1: Extended Session - OK");
 
             // Step 2: DTC Check
             _logger?.LogStep("Step 2: DTC Check");
-            byte[] dtcResult = CheckDTC();
-            Console.WriteLine($"[Radar] Step 2: DTC Check - {dtcResult.Length} bytes");
+            CheckDTC();
 
-            // Step 3: EOL Alignment (Security Access 불필요!)
+            // Step 3: EOL Alignment
             _logger?.LogStep("Step 3: EOL Alignment ($FFA0)");
-            bool alignResult = RadarEOLAlignment();
-            Console.WriteLine($"[Radar] Step 3: EOL Alignment - {(alignResult ? "PASS" : "FAIL")}");
+            RadarEOLAlignment();
 
             // Step 4: ECU Reset
             _logger?.LogStep("Step 4: ECU Reset");
             EcuReset();
             Thread.Sleep(2000);
-            Console.WriteLine("[Radar] Step 4: ECU Reset - OK");
 
             // Step 5: Extended Session (재진입)
             _logger?.LogStep("Step 5: Extended Session (Re-enter)");
@@ -662,20 +866,15 @@ namespace bhm_LDWS
 
             // Step 6: Read Alignment Data
             _logger?.LogStep("Step 6: Read Alignment Data ($FEA7)");
-            byte[] alignData = RadarReadAlignmentData();
-            Console.WriteLine($"[Radar] Step 5: Read Alignment Data - {alignData.Length} bytes");
+            RadarReadAlignmentData();
 
             // Step 7: Clear DTC
             _logger?.LogStep("Step 7: Clear DTC");
             ClearDTC();
-            Console.WriteLine("[Radar] Step 6: Clear DTC - OK");
 
             // Step 8: Final DTC Check
             _logger?.LogStep("Step 8: Final DTC Check");
-            dtcResult = CheckDTC();
-            Console.WriteLine($"[Radar] Step 7: Final DTC Check - {dtcResult.Length} bytes");
-
-            Console.WriteLine("=== [Radar] EOL Test Completed ===");
+            CheckDTC();
         }
 
         #endregion

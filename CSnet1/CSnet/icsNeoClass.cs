@@ -4,66 +4,109 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
+
 static class Constants
 {
     // Constants used to calculate the timestamp
-    public const double NEOVI_TIMESTAMP_2 = 0.1048576;
-    public const double NEOVI_TIMESTAMP_1 = 0.0000016;
-
-    public const double NEOVIPRO_VCAN_TIMESTAMP_2 = 0.065536;
-    public const double NEOVIPRO_VCAN_TIMESTAMP_1 = 0.000001;
-
-    public const double NEOVI6_VCAN_TIMESTAMP_2 = 0.065536;
-    public const double NEOVI6_VCAN_TIMESTAMP_1 = 0.000001;
-
-    public const double NEOVI_RED_TIMESTAMP_2_25NS = 107.3741824;
-    public const double NEOVI_RED_TIMESTAMP_1_25NS = 0.000000025;
-
-    public const double NEOVI_RED_TIMESTAMP_2_10NS = 429.4967296;
+    public const double NEOVI_TIMESTAMP_2  = 0.1048576; 
+    public const double NEOVI_TIMESTAMP_1  = 0.0000016;
+    
+    public const double NEOVIPRO_VCAN_TIMESTAMP_2  = 0.065536;
+    public const double NEOVIPRO_VCAN_TIMESTAMP_1  = 0.000001;
+    
+    public const double NEOVI6_VCAN_TIMESTAMP_2  = 0.065536;
+    public const double NEOVI6_VCAN_TIMESTAMP_1  = 0.000001;
+    
+    public const double NEOVI_RED_TIMESTAMP_2_25NS  = 107.3741824;
+    public const double NEOVI_RED_TIMESTAMP_1_25NS  = 0.000000025;
+    
+    public const double NEOVI_RED_TIMESTAMP_2_10NS  = 429.4967296;
     public const double NEOVI_RED_TIMESTAMP_1_10NS = 0.000000010;
 }
 
-namespace bhm_LDWS
+namespace CSnet
 {
     public enum eHardwareTypes : uint
     {
-        NEODEVICE_UNKNOWN = 0,
-        NEODEVICE_BLUE = 1,
-        NEODEVICE_SW_VCAN = 2,
-        NEODEVICE_DW_VCAN = 4,
-        NEODEVICE_VCAN41 = 7,
-        NEODEVICE_FIRE = 8,
-        NEODEVICE_VCAN3 = 16,
-        NEODEVICE_VCAN4_IND = 18,
-        NEODEVICE_YELLOW = 32,  //Deprecated
-        NEODEVICE_RED = 64,
-        NEODEVICE_ECU = 128,
-        NEODEVICE_IEVB = 256,
-        NEODEVICE_PENDANT = 512,
-        NEODEVICE_VIRTUAL_NEOVI = 1024,
-        NEODEVICE_ECUCHIP_UART = 2048,
-        NEODEVICE_PLASMA_1_11 = 0x1000,
-        NEODEVICE_PLASMA_1_12 = 0x10000,
-        NEODEVICE_PLASMA_1_13 = 0x20000,
-        NEODEVICE_ANY_PLASMA = (NEODEVICE_PLASMA_1_11 | NEODEVICE_FIRE_VNET | NEODEVICE_PLASMA_1_12 | NEODEVICE_PLASMA_1_13),
-        NEODEVICE_FIRE_VNET = 0x2000,
-        NEODEVICE_NEOANALOG = 0x4000,
-        NEODEVICE_ION_2 = 0x40000,
-        NEODEVICE_ION_3 = 0x100000,
-        NEODEVICE_ANY_ION = (NEODEVICE_ION_2 | NEODEVICE_ION_3),
-        NEODEVICE_RADSTAR = 0x80000,
-        NEODEVICE_VCANFD = 0x200000,
-        NEODEVICE_VCAN42 = 0x400000,
-        NEODEVICE_ECU25 = 0x800000,
-        NEODEVICE_EEVB = 0x1000000,
-        NEODEVICE_VCANRF = 0x2000000,
-        NEODEVICE_FIRE2 = 0x4000000,
-        NEODEVICE_FLEX = 0x8000000,
+        NEODEVICE_UNKNOWN = 0x00000000,
+        NEODEVICE_BLUE = 0x00000001,
+        NEODEVICE_ECU_AVB = 0x00000002,
+        NEODEVICE_RADSUPERMOON = 0x00000003,
+        NEODEVICE_DW_VCAN = 0x00000004,
+        NEODEVICE_RADMOON2 = 0x00000005,
+        NEODEVICE_RADGIGALOG = 0x00000006,
+        NEODEVICE_VCAN41 = 0x00000007,
+        NEODEVICE_FIRE = 0x00000008,
+        NEODEVICE_RADPLUTO = 0x00000009,
+        NEODEVICE_VCAN42_EL = 0x0000000a,
+        NEODEVICE_RADIO_CANHUB = 0x0000000b,
+        NEODEVICE_NEOECU12 = 0x0000000c,
+        NEODEVICE_OBD2_LCBADGE = 0x0000000d,
+        NEODEVICE_RAD_MOON_DUO = 0x0000000e,
+        NEODEVICE_VCAN3 = 0x00000010,
+        NEODEVICE_RADJUPITER = 0x00000011,
+        NEODEVICE_VCAN4_IND = 0x00000012,
+        NEODEVICE_GIGASTAR = 0x00000013,
+        NEODEVICE_ECU22 = 0x00000015,
+        NEODEVICE_RED = 0x00000040,
+        NEODEVICE_ECU = 0x00000080,
+        NEODEVICE_IEVB = 0x00000100,
+        NEODEVICE_PENDANT = 0x00000200,
+        NEODEVICE_OBD2_PRO = 0x00000400,
+        NEODEVICE_PLASMA = 0x00001000,
+        NEODEVICE_NEOANALOG = 0x00004000,
+        NEODEVICE_CT_OBD = 0x00008000,
+        NEODEVICE_ION = 0x00040000,
+        NEODEVICE_RADSTAR = 0x00080000,
+        NEODEVICE_VCAN44 = 0x00200000,
+        NEODEVICE_VCAN42 = 0x00400000,
+        NEODEVICE_CMPROBE = 0x00800000,
+        NEODEVICE_EEVB = 0x01000000,
+        NEODEVICE_VCANRF = 0x02000000,
+        NEODEVICE_FIRE2 = 0x04000000,
+        NEODEVICE_FLEX = 0x08000000,
         NEODEVICE_RADGALAXY = 0x10000000,
         NEODEVICE_RADSTAR2 = 0x20000000,
         NEODEVICE_VIVIDCAN = 0x40000000,
         NEODEVICE_OBD2_SIM = 0x80000000,
         NEODEVICE_ALL = 0xFFFFBFFF,
+    }
+
+    public enum EDeviceSettingsType : uint
+    {
+        DeviceFireSettingsType = 00,
+        DeviceFireVnetSettingsType = 01,
+        DeviceFire2SettingsType = 02,
+        DeviceVCAN3SettingsType = 03,
+        DeviceRADGalaxySettingsType = 04,
+        DeviceRADStar2SettingsType = 05,
+        DeviceVCAN4SettingsType = 06,
+        DeviceVCAN412SettingsType = 07,
+        DeviceVividCANSettingsType = 08,
+        DeviceECU_AVBSettingsType = 09,
+        DeviceRADSuperMoonSettingsType = 10,
+        DeviceRADMoon2SettingsType = 11,
+        DeviceRADPlutoSettingsType = 12,
+        DeviceRADGigalogSettingsType = 13,
+        DeviceVCANRFSettingsType = 14,
+        DeviceEEVBSettingsType = 15,
+        DeviceVCAN4IndSettingsType = 16,
+        DeviceNeoECU12SettingsType = 17,
+        DeviceFlexVnetzSettingsType = 18,
+        DeviceCANHUBSettingsType = 19,
+        DeviceIEVBSettingsType = 20,
+        DeviceOBD2SimSettingsType = 21,
+        DeviceCMProbeSettingsType = 22,
+        DeviceOBD2ProSettingsType = 23,
+        DevicePlaceHolder0SettingsType = 24,
+        DeviceRADPlutoSwitchSettingsType = 25,
+        DeviceRADGigastarSettingsType = 26,
+        DeviceRADJupiterSettingsType = 27,
+        DevicePlaceHolder1SettingsType = 28,
+        DeviceRadMoonDuoSettingsType = 29,
+        DeviceEtherBadgeSettingsType = 30,
+        DeviceRADA2BSettingsType = 31,
+        DeviceSettingsTypeMax = 32
     }
 
     public enum eDATA_STATUS_BITFIELD_1 : uint  //: long 
@@ -152,11 +195,20 @@ namespace bhm_LDWS
         SPY_STATUS2_ETHERNET_FCS_AVAILABLE = 0x800000, //This frame contains FCS (4 bytes) obtained from ICS Ethernet hardware (ex. RAD-STAR)
     }
 
-    public enum eDATA_STATUS_BITFIELD_3
+    public enum eDATA_STATUS_BITFIELD_3_LIN
     {
         SPY_STATUS3_LIN_JUST_BREAK_SYNC = 1,
         SPY_STATUS3_LIN_SLAVE_DATA_TOO_SHORT = 2,
         SPY_STATUS3_LIN_ONLY_UPDATE_SLAVE_TABLE_ONCE = 4,
+    }
+
+    public enum eDATA_STATUS_BITFIELD_3_CANFD
+    {
+        SPY_STATUS3_CANFD_ESI = 0x01,
+        SPY_STATUS3_CANFD_IDE = 0x02,
+        SPY_STATUS3_CANFD_RTR = 0x04,
+        SPY_STATUS3_CANFD_FDF = 0x08,
+        SPY_STATUS3_CANFD_BRS = 0x10,
     }
 
     public enum icsConfigSetup : short
@@ -188,21 +240,22 @@ namespace bhm_LDWS
         NETID_MSCAN = 2,
         NETID_SWCAN = 3,
         NETID_LSFTCAN = 4,
-        NETID_FORDSCP = 5,
-        NETID_J1708 = 6,
-        NETID_JVPW = 8,
         NETID_ISO = 9,
         NETID_ISO2 = 14,
         NETID_ISO14230 = 15,
         NETID_LIN = 16,
+        NETID_OP_ETHERNET1 = 17,
+        NETID_OP_ETHERNET2 = 18,
+        NETID_OP_ETHERNET3 = 19,
         NETID_ISO3 = 41,
         NETID_HSCAN2 = 42,
         NETID_HSCAN3 = 44,
+        NETID_OP_ETHERNET4 = 45,
+        NETID_OP_ETHERNET5 = 46,
         NETID_ISO4 = 47,
         NETID_LIN2 = 48,
         NETID_LIN3 = 49,
         NETID_LIN4 = 50,
-        NETID_LIN5 = 84,
         NETID_MOST = 51,
         NETID_CGI = 53,
         NETID_HSCAN4 = 61,
@@ -211,36 +264,30 @@ namespace bhm_LDWS
         NETID_UART2 = 65,
         NETID_UART3 = 66,
         NETID_UART4 = 67,
-        NETID_SWCAN2 = 68, //changed from ANALOG,
-        NETID_ETHERNET_DAQ = 69, //NETID_WIZNET - plasma/ ion daq port ethernet,
-        NETID_TEXTAPI_TO_HOST = 71,
-        NETID_FLEXRAY1A = 80,
-        NETID_FLEXRAY1B = 81,
-        NETID_FLEXRAY2A = 82,
-        NETID_FLEXRAY2B = 83,
-        NETID_FLEXRAY = 85,
-        NETID_MOST25 = 90,
-        NETID_MOST50 = 91,
-        NETID_MOST150 = 92,
-        NETID_ETHERNET = 93,
-        NETID_GMFSA = 94,
-        NETID_TCP = 95,
-        NETID_HSCAN6 = 96,
-        NETID_HSCAN7 = 97,
-        NETID_LIN6 = 98,
-        NETID_LSFTCAN2 = 99,
-        NETID_OP_ETHERNET1 = 17,
-        NETID_OP_ETHERNET2 = 18,
-        NETID_OP_ETHERNET3 = 19,
-        NETID_OP_ETHERNET4 = 45,
-        NETID_OP_ETHERNET5 = 46,
+        NETID_SWCAN2 = 68,
+        NETID_ETHERNET_DAQ = 69,
         NETID_OP_ETHERNET6 = 73,
         NETID_OP_ETHERNET7 = 75,
         NETID_OP_ETHERNET8 = 76,
         NETID_OP_ETHERNET9 = 77,
         NETID_OP_ETHERNET10 = 78,
         NETID_OP_ETHERNET11 = 79,
+        NETID_FLEXRAY1A = 80,
+        NETID_FLEXRAY1B = 81,
+        NETID_FLEXRAY2A = 82,
+        NETID_FLEXRAY2B = 83,
+        NETID_LIN5 = 84,
+        NETID_FLEXRAY = 85,
+        NETID_FLEXRAY2 = 86,
         NETID_OP_ETHERNET12 = 87,
+        NETID_MOST25 = 90,
+        NETID_MOST50 = 91,
+        NETID_MOST150 = 92,
+        NETID_ETHERNET = 93,
+        NETID_HSCAN6 = 96,
+        NETID_HSCAN7 = 97,
+        NETID_LIN6 = 98,
+        NETID_LSFTCAN2 = 99,
     }
 
     //Vnet Enum for SlaveVnet types
@@ -281,10 +328,12 @@ namespace bhm_LDWS
     //CoreMini Location
     public enum eScriptLocation : int
     {
-        SCRIPT_LOCATION_FLASH_MEM = 0,   //(Valid only on a neoVI Fire or neoVI Red)
-        SCRIPT_LOCATION_SDCARD = 1,  //(Valid only on a neoVI Fire or neoVI Red)
-        SCRIPT_LOCATION_VCAN3_MEM = 2,   //(Valid only on a ValueCAN 3 device)
+        SCRIPT_LOCATION_FLASH_MEM = 0,
+        SCRIPT_LOCATION_SDCARD = 1,
+        SCRIPT_LOCATION_INTERNAL_FLASH = 2,
+        SCRIPT_LOCATION_VCAN3_MEM = 4,
     }
+
 
     // ePROTOCOL
     public enum ePROTOCOL : int
@@ -342,10 +391,10 @@ namespace bhm_LDWS
     public enum ePORT_TYPE : short
     {
         NEOVI_COMMTYPE_RS232 = 0,
-        NEOVI_COMMTYPE_USB_BULK = 1,
-        NEOVI_COMMTYPE_USB_ISO_DONT_USE = 2,
+        NEOVI_COMMTYPE_USB_BULK	= 1,
+        NEOVI_COMMTYPE_USB_ISO_DONT_USE	= 2,
         NEOVI_COMMTYPE_TCPIP = 3,
-        NEOVI_COMMTYPE_FIRE_USB = 5,
+        NEOVI_COMMTYPE_FIRE_USB	= 5,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -384,6 +433,7 @@ namespace bhm_LDWS
         public byte MiscData;
     }
 
+
     [StructLayout(LayoutKind.Sequential)]
     public struct VSBSpyMessage   //reff
     {
@@ -416,9 +466,10 @@ namespace bhm_LDWS
         public Int32 StatusBitField3;
         public Int32 StatusBitField4;
         //public byte[] AckBytes = new byte[8]; //(1 To 8); //new '8
-        public UInt32 iExtraDataPtr; //  4 
+        public UInt32  iExtraDataPtr; //  4 
         public byte MiscData;
     }
+
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct stAPIFirmwareInfo
@@ -446,6 +497,7 @@ namespace bhm_LDWS
         public byte iBootLoaderVersionMinor;
     }
 
+    
     [StructLayout(LayoutKind.Sequential)]
     public struct icsSpyMessageLong
     {
@@ -497,7 +549,6 @@ namespace bhm_LDWS
         public byte Header2;
         public byte Header3;
         public byte Header4;
-
         public byte Data1;
         public byte Data2;
         public byte Data3;
@@ -506,25 +557,6 @@ namespace bhm_LDWS
         public byte Data6;
         public byte Data7;
         public byte Data8;
-
-        public byte Data9;
-        public byte Data10;
-        public byte Data11;
-        public byte Data12;
-        public byte Data13;
-        public byte Data14;
-        public byte Data15;
-        public byte Data16;
-
-        public byte Data17;
-        public byte Data18;
-        public byte Data19;
-        public byte Data20;
-        public byte Data21;
-        public byte Data22;
-        public byte Data23;
-        public byte Data24;
-
         public byte ACK1;
         public byte ACK2;
         public byte ACK3;
@@ -577,11 +609,11 @@ namespace bhm_LDWS
         public UInt32 Reserved3;
         public UInt32 Reserved4;
         public UInt32 Reserved5;
-    }
+     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct OptionsNeoEx
-    {
+     [StructLayout(LayoutKind.Sequential)]
+     public struct OptionsNeoEx
+     {
         Int32 CANOptions;
         Int32 Reserved00;
         Int32 Reserved01;
@@ -599,7 +631,7 @@ namespace bhm_LDWS
         Int32 Reserved13;
         Int32 Reserved14;
         Int32 Reserved15;
-    }
+     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct CAN_SETTINGS
@@ -629,7 +661,7 @@ namespace bhm_LDWS
         public UInt16 FDBRP;
         public byte FDTDC;
         public byte reserved;
-    }
+    } 
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SWCAN_SETTINGS
@@ -666,7 +698,7 @@ namespace bhm_LDWS
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SVCAN412Settings
     {
-        /* Performance Test */
+	    /* Performance Test */
         public UInt16 perf_en;
 
         public CAN_SETTINGS can1;
@@ -681,14 +713,15 @@ namespace bhm_LDWS
         public UInt32 pwr_man_enable;
 
         public UInt16 network_enabled_on_boot;
-
-        /* ISO15765-2 Transport Layer */
+    
+    	/* ISO15765-2 Transport Layer */
         public Int16 iso15765_separation_time_offset;
 
         public STextAPISettings text_api;
         public UInt32 reserved;
-    }
+     }
 
+    
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct LIN_SETTINGS
     {
@@ -725,13 +758,13 @@ namespace bhm_LDWS
         public byte rsvd1;
         public byte rsvd2;
         public byte rsvd3;
-    }
+    }   
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SNeoMostGatewaySettings
     {
-        public UInt16 netId;        //Netid of CAN network to use.
-        public byte zero;
+        public UInt16 netId;		//Netid of CAN network to use.
+	    public byte zero;
         public byte Config;
         //Bit 0: enable bit to enalbe most
         //Bit 1-3: index of which miscio to use for timestamp sync. 0 => MISC1
@@ -753,34 +786,42 @@ namespace bhm_LDWS
         UInt16 tapPair4;
         UInt16 tapPair5;
         UInt32 flags;    // Bit field unsigned (bTapEnSwitch: 1; bTapEnPtp: 2; bEnReportLinkQuality: 4)
-    }
+    }       
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct OP_ETH_SETTINGS
     {
         byte ucConfigMode;
         byte preemption_en;
-        byte reserved0;
-        byte reserved1;
-        byte reserved2;
-        byte reserved3;
-        byte reserved4;
-        byte reserved5;
-        byte reserved6;
-        byte reserved7;
-        byte reserved8;
-        byte reserved9;
-        byte reserved10;
-        byte reserved11;
-        byte reserved12;
-        byte reserved13;
+        byte mac_addr1_0;
+        byte mac_addr1_1;
+        byte mac_addr1_2;
+        byte mac_addr1_3;
+        byte mac_addr1_4;
+        byte mac_addr1_5;
+        byte mac_addr2_0;
+        byte mac_addr2_1;
+        byte mac_addr2_2;
+        byte mac_addr2_3;
+        byte mac_addr2_4;
+        byte mac_addr2_5;
+        byte OpEthFlags;
+        //AND to combind these values
+        //mac_spoofing_en : 1
+        //mac_spoofing_isDstOrSrc : 2
+        //link_spd_A : 4
+        //link_spd_B : 8
+        //q2112_phy_mode : 16
+        byte Reserved;
     }
+
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct J1708_SETTINGS
     {
         public UInt16 enable_convert_mode;
     }
+
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SVCANRFSettings
@@ -854,7 +895,7 @@ namespace bhm_LDWS
         public UInt16 ain_threshold;
 
         public UInt32 rsvd;
-    }
+    } 
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct STextAPISettings
@@ -883,6 +924,7 @@ namespace bhm_LDWS
         public Int32 Reserved3;
         public Int32 Reserved4;
     }
+
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct ISO9141_KEYWORD2000_SETTINGS
@@ -919,6 +961,65 @@ namespace bhm_LDWS
         public UInt16 time_500us;
         public UInt16 k;
         public UInt16 l;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct TIMESYNC_ICSHARDWARE_SETTINGS
+    {
+        public byte MasterEnable;
+        public byte SlaveEnable;
+        public byte MasterNetwork;
+        public byte SlaveNetwork;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct SRADSuperMoonSettingsPack
+    {
+        public UInt32 uiDevice;
+        public SRADSuperMoonSettings SuperMoonSettings;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct SRADSuperMoonSettings
+    {
+        public UInt16 perf_en;
+     
+        public OP_ETH_GENERAL_SETTINGS opEthGen;
+        public OP_ETH_SETTINGS opEth1;
+        
+        public UInt16 network_enables;
+        public UInt16 network_enables_2;
+        public UInt16 network_enabled_on_boot;
+        public UInt16 network_enables_3;
+        
+        public STextAPISettings text_api;
+        
+        public UInt16 pc_com_mode;
+        public TIMESYNC_ICSHARDWARE_SETTINGS timeSyncSettings;
+        public UInt16 hwComLatencyTestEn;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct SRADMoon2SettingsPack
+    {
+        public UInt32 uiDevice;
+        public SRADMoon2Settings Moon2Settings;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct SRADMoon2Settings
+    {
+        public UInt16 perf_en;
+        public OP_ETH_GENERAL_SETTINGS opEthGen;
+        public OP_ETH_SETTINGS opEth1;
+        public UInt16 network_enables;
+        public UInt16 network_enables_2;
+        public UInt16 network_enabled_on_boot;
+        public UInt16 network_enables_3;
+        public STextAPISettings text_api;
+        public UInt16 pc_com_mode;
+        public TIMESYNC_ICSHARDWARE_SETTINGS timeSyncSettings;
+        public UInt16 hwComLatencyTestEn;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
@@ -994,6 +1095,8 @@ namespace bhm_LDWS
 
         public UInt16 can_switch_mode;
         public STextAPISettings text_api;
+        public TIMESYNC_ICSHARDWARE_SETTINGS timeSyncSettings;
+		public UInt16 hwComLatencyTestEn;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
@@ -1213,6 +1316,77 @@ namespace bhm_LDWS
         public UInt16 digitalIoThresholdEnable;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct SRADPlutoSettingsPack
+    {
+        public UInt32 uiDevice;
+        public SRADPlutoSettings PlutoSettings;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct SRADPlutoSettings
+    {
+        public UInt16 perf_en;
+        public CAN_SETTINGS can1;
+        public CANFD_SETTINGS canfd1;
+        public CAN_SETTINGS can2;
+        public CANFD_SETTINGS canfd2;
+        public LIN_SETTINGS lin1;
+
+        public UInt16 network_enables;
+        public UInt16 network_enables_2;
+        public UInt16 network_enables_3;
+        public UInt64 termination_enables;
+        public UInt16 misc_io_analog_enable;
+
+        public UInt32 pwr_man_timeout;
+        public UInt16 pwr_man_enable;
+
+        public UInt16 network_enabled_on_boot;
+
+        //ISO15765-2 Transport Layer 
+        public UInt16 iso15765_separation_time_offset;
+        public UInt16 iso9141_kwp_enable_reserved;
+        public UInt16 iso_tester_pullup_enable;
+        public UInt16 iso_parity;
+        public UInt16 iso_msg_termination;
+        public ISO9141_KEYWORD2000_SETTINGS iso9141_kwp_settings_1;
+        public ETHERNET_SETTINGS ethernet;
+
+        public STextAPISettings text_api;
+        public UInt32 Flags;
+        //Flag values
+        //disableUsbCheckOnBoot 1
+        //enableLatencyTest 2
+        //enablePcEthernetComm 4
+        public SPluto_CustomParams custom;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct SPluto_CustomParams
+    {
+        public Byte mode0;
+        public Byte mode1;
+        public Byte mode2; 
+        public Byte mode3; 
+        public Byte mode4; 
+        public Byte speed0; 
+        public Byte speed1; 
+        public Byte speed2; 
+        public Byte speed3; 
+        public Byte speed4; 
+        public Byte PhyEnable0;
+        public Byte PhyEnable1; 
+        public Byte PhyEnable2; 
+        public Byte PhyEnable3; 
+        public Byte PhyEnable4; 
+        public Byte ae1Select; 
+        public Byte usbSelect;
+        public Byte pad; 
+    }
+
+
+    
     //_stChipVersions
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct fire_versions
@@ -1236,8 +1410,8 @@ namespace bhm_LDWS
         public Byte core_min;
         public Byte lpic_maj;
         public Byte lpic_min;
-        public Byte hid_maj;
-        public Byte hid_min;
+        public Byte hid_maj; 
+        public Byte hid_min; 
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
@@ -1248,6 +1422,7 @@ namespace bhm_LDWS
         public UInt32 Reserve;
         public UInt16 Reserve2;
     }
+
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct stCM_ISO157652_TxMessage
@@ -1270,7 +1445,7 @@ namespace bhm_LDWS
         public UInt16 fs_wait; //< max timeout (ms) for waiting on flow control response after receiving flow control
         ///with flow status set to WAIT.   Set this to N_BS_MAX's value if J2534.
         //******************************************************************************************************************
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4095)] public byte[] data;
+        [MarshalAs(UnmanagedType.ByValArray,SizeConst=4095)] public byte[] data;
         // call: stCM_ISO157652_TxMessage.data = new byte(4096)
         //******************************************************************************************************************
         public UInt32 num_bytes; //< Number of data bytes
@@ -1331,6 +1506,7 @@ namespace bhm_LDWS
         public byte reserved15;
     }
 
+
     public enum stCM_ISO157652_RxMessage_Flags : int
     {
         id_29_bit_enable = 1, //< Enables 29 bit arbId filter for frames (from ECU to neoVI).
@@ -1341,6 +1517,29 @@ namespace bhm_LDWS
         paddingEnable = 32, //< Enable's padding
         iscanFD = 64,
         isBRSEnabled = 128,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PhyRegPktClauseMess_t
+    {
+        public byte phyAddrOrPort; //5 bits  clause 22 uses Address, 45 Uses Port
+        public byte pageOrDevice; //5 bits  clause 22 uses page, 45 Uses Device
+        public UInt16 regAddr; //5 bits
+        public UInt16 regVal;
+    } //6 bytes
+
+    public enum PhyRegFlags : short
+    {
+        Enabled = 1,
+        WriteEnable = 2,
+        Clause45Enable = 4,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PhyRegPkt_t
+    {
+        public UInt16 Flags;
+        public PhyRegPktClauseMess_t ClausePkt;
     }
 
     public class icsNeoDll
@@ -1448,10 +1647,16 @@ namespace bhm_LDWS
         public static extern Int32 icsneoGetVCANRFSettings(IntPtr hObject, ref SVCANRFSettings pSettings, Int32 iNumBytes);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoSetVCANRFSettings(IntPtr hObject, ref SVCANRFSettings pSettings, Int32 iNumBytes, Int32 bSaveToEEPROM);
+        [DllImport("icsneo40.dll")]
+        public static extern Int32 icsneoSetDeviceSettings(IntPtr hObject, ref SRADPlutoSettingsPack pSettings, Int32 iNumBytes,Int32 bSaveToEEPROM , Int32 VnetChan);
+        [DllImport("icsneo40.dll")]
+        public static extern Int32 icsneoGetDeviceSettings(IntPtr hObject,ref SRADPlutoSettingsPack pSettings,Int32 iNumBytes, Int32 VnetChan);
 
 
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoSetBitRate(IntPtr hObject, Int32 BitRate, Int32 NetworkID);
+        [DllImport("icsneo40.dll")]
+        public static extern Int32 icsneoSetFDBitRate(IntPtr hObject, Int32 BitRate, Int32 NetworkID);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoGetDeviceParameters(IntPtr hObject, ref char pParameter, ref char pValues, Int16 ValuesLength);
         [DllImport("icsneo40.dll")]
@@ -1493,15 +1698,17 @@ namespace bhm_LDWS
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoISO15765_DisableNetworks(IntPtr hObject);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoISO15765_EnableNetworks(IntPtr hObject, Int32 Network);
+        public static extern Int32 icsneoISO15765_EnableNetworks (IntPtr hObject, Int32 Network);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoFindAllCOMDevices(Int32 lDriverType, Int32 lGetSerialNumbers, Int32 lStopAtFirst, Int32 lUSBCommOnly, ref Int32 p_lDeviceTypes, ref Int32 p_lComPorts, ref Int32 p_lSerialNumbers, ref Int32 lNumDevices);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoISO15765_TransmitMessage(IntPtr hObject, Int32 ulNetworkID, ref stCM_ISO157652_TxMessage pMsg, Int32 ulBlockingTimeout);
+        public static extern Int32 icsneoISO15765_TransmitMessage(IntPtr hObject,Int32 ulNetworkID,ref stCM_ISO157652_TxMessage pMsg,Int32 ulBlockingTimeout);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoISO15765_ReceiveMessage(IntPtr hObject, Int32 ulNetworkID, ref stCM_ISO157652_RxMessage pMsg);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoSerialNumberToString(UInt32 Serial, ref byte Data, ref UInt32 DataSize);
+        public static extern Int32 icsneoSerialNumberToString(UInt32 Serial,ref byte Data, ref UInt32 DataSize);
+        [DllImport("icsneo40.dll")]
+        public static extern Int32 icsneoReadWritePHYSettings(IntPtr hObject, ref PhyRegPkt_t PHYSettings, IntPtr size, IntPtr NumEntries);
 
         public static double icsneoGetTimeStamp(long TimeHardware, long TimeHardware2)
         {
@@ -1537,7 +1744,7 @@ namespace bhm_LDWS
             icsJ1850Struct.Data6 = icsCANStruct.Data6;
             icsJ1850Struct.Data7 = icsCANStruct.Data7;
             icsJ1850Struct.Data8 = icsCANStruct.Data8;
-            icsJ1850Struct.ACK4 = Convert.ToByte((icsCANStruct.StatusBitField3 & 0xFF000000) >> 24);
+            icsJ1850Struct.ACK4 = Convert.ToByte ((icsCANStruct.StatusBitField3 & 0xFF000000) >> 24);
             icsJ1850Struct.ACK3 = Convert.ToByte((icsCANStruct.StatusBitField3 & 0xFF0000) >> 16);
             icsJ1850Struct.ACK2 = Convert.ToByte((icsCANStruct.StatusBitField3 & 0xFF00) >> 8);
             icsJ1850Struct.ACK1 = Convert.ToByte((icsCANStruct.StatusBitField3 & 0xFF));
@@ -1599,7 +1806,7 @@ namespace bhm_LDWS
                 return sOut;
             }
             //Format unsigned Int32eger value to hex 
-            sOut = String.Format("{0:X2}", uiDecimal);
+            sOut = String.Format("{0:x2}", uiDecimal);
             return sOut;
         }
 
@@ -1619,314 +1826,286 @@ namespace bhm_LDWS
             return Convert.ToInt32(uiHex);
         }
 
-        public static Int32 GetNetworkIDfromString(ref string NetworkName)
+    public static Int32 GetNetworkIDfromString(ref string NetworkName)
+    {
+        switch (NetworkName)
         {
-            switch (NetworkName)
-            {
-                case "DEVICE":
-                    return ((int)eNETWORK_ID.NETID_DEVICE);
-                case "HSCAN":
-                    return ((int)eNETWORK_ID.NETID_HSCAN);
-                case "MSCAN":
-                    return ((int)eNETWORK_ID.NETID_MSCAN);
-                case "SWCAN":
-                    return ((int)eNETWORK_ID.NETID_SWCAN);
-                case "LSFTCAN":
-                    return ((int)eNETWORK_ID.NETID_LSFTCAN);
-                case "FORDSCP":
-                    return ((int)eNETWORK_ID.NETID_FORDSCP);
-                case "J1708":
-                    return ((int)eNETWORK_ID.NETID_J1708);//No longer Supported
-                case "JVPW":
-                    return ((int)eNETWORK_ID.NETID_JVPW);//No longer Supported
-                case "ISO":
-                    return ((int)eNETWORK_ID.NETID_ISO);
-                case "ISO2":
-                    return ((int)eNETWORK_ID.NETID_ISO2);
-                case "ISO14230":
-                    return ((int)eNETWORK_ID.NETID_ISO14230);
-                case "LIN":
-                    return ((int)eNETWORK_ID.NETID_LIN);
-                case "ISO3":
-                    return ((int)eNETWORK_ID.NETID_ISO3);
-                case "HSCAN2":
-                    return ((int)eNETWORK_ID.NETID_HSCAN2);
-                case "HSCAN3":
-                    return ((int)eNETWORK_ID.NETID_HSCAN3);
-                case "ISO4":
-                    return ((int)eNETWORK_ID.NETID_ISO4);
-                case "LIN2":
-                    return ((int)eNETWORK_ID.NETID_LIN2);
-                case "LIN3":
-                    return ((int)eNETWORK_ID.NETID_LIN3);
-                case "LIN4":
-                    return ((int)eNETWORK_ID.NETID_LIN4);
-                case "LIN5":
-                    return ((int)eNETWORK_ID.NETID_LIN5);
-                case "MOST":
-                    return ((int)eNETWORK_ID.NETID_MOST);
-                case "CGI":
-                    return ((int)eNETWORK_ID.NETID_CGI);
-                case "HSCAN4":
-                    return ((int)eNETWORK_ID.NETID_HSCAN4);
-                case "HSCAN5":
-                    return ((int)eNETWORK_ID.NETID_HSCAN5);
-                case "UART":
-                    return ((int)eNETWORK_ID.NETID_UART);
-                case "UART2":
-                    return ((int)eNETWORK_ID.NETID_UART2);
-                case "UART3":
-                    return ((int)eNETWORK_ID.NETID_UART3);
-                case "UART4":
-                    return ((int)eNETWORK_ID.NETID_UART4);
-                case "SWCAN2":
-                    return ((int)eNETWORK_ID.NETID_SWCAN2);
-                case "ETHERNE":
-                    return ((int)eNETWORK_ID.NETID_ETHERNET_DAQ);
-                case "TEXTAP":
-                    return ((int)eNETWORK_ID.NETID_TEXTAPI_TO_HOST);
-                case "FLEXRAY1A":
-                    return ((int)eNETWORK_ID.NETID_FLEXRAY1A);
-                case "FLEXRAY1B":
-                    return ((int)eNETWORK_ID.NETID_FLEXRAY1B);
-                case "FLEXRAY2A":
-                    return ((int)eNETWORK_ID.NETID_FLEXRAY2A);
-                case "FLEXRAY2B":
-                    return ((int)eNETWORK_ID.NETID_FLEXRAY2B);
-                case "FLEXRAY":
-                    return ((int)eNETWORK_ID.NETID_FLEXRAY);
-                case "MOST25":
-                    return ((int)eNETWORK_ID.NETID_MOST25);
-                case "MOST50":
-                    return ((int)eNETWORK_ID.NETID_MOST50);
-                case "MOST150":
-                    return ((int)eNETWORK_ID.NETID_MOST150);
-                case "ETHERNET":
-                    return ((int)eNETWORK_ID.NETID_ETHERNET);
-                case "GMFSA":
-                    return ((int)eNETWORK_ID.NETID_GMFSA);
-                case "TCP":
-                    return ((int)eNETWORK_ID.NETID_TCP);
-                case "HSCAN6":
-                    return ((int)eNETWORK_ID.NETID_HSCAN6);
-                case "HSCAN7":
-                    return ((int)eNETWORK_ID.NETID_HSCAN7);
-                case "LIN6":
-                    return ((int)eNETWORK_ID.NETID_LIN6);
-                case "LSFTCAN2":
-                    return ((int)eNETWORK_ID.NETID_LSFTCAN2);
-                case "OP_ETHERNET1":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET1);
-                case "OP_ETHERNET2":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET2);
-                case "OP_ETHERNET3":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET3);
-                case "OP_ETHERNET4":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET4);
-                case "OP_ETHERNET5":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET5);
-                case "OP_ETHERNET6":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET6);
-                case "OP_ETHERNET7":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET7);
-                case "OP_ETHERNET8":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET8);
-                case "OP_ETHERNET9":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET9);
-                case "OP_ETHERNET10":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET10);
-                case "OP_ETHERNET11":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET11);
-                case "OP_ETHERNET12":
-                    return ((int)eNETWORK_ID.NETID_OP_ETHERNET12);
-            }
-            return (-1);
+            case "DEVICE":
+                return ((int)eNETWORK_ID.NETID_DEVICE);
+            case "HSCAN":
+                return ((int)eNETWORK_ID.NETID_HSCAN);
+            case "MSCAN":
+                return ((int)eNETWORK_ID.NETID_MSCAN);
+            case "SWCAN":
+                return ((int)eNETWORK_ID.NETID_SWCAN);
+            case "LSFTCAN":
+                return ((int)eNETWORK_ID.NETID_LSFTCAN);
+            case "ISO":
+                return ((int)eNETWORK_ID.NETID_ISO);
+            case "ISO2":
+                return ((int)eNETWORK_ID.NETID_ISO2);
+            case "ISO14230":
+                return ((int)eNETWORK_ID.NETID_ISO14230);
+            case "LIN":
+                return ((int)eNETWORK_ID.NETID_LIN);
+            case "ISO3":
+                return ((int)eNETWORK_ID.NETID_ISO3);
+            case "HSCAN2":
+                return ((int)eNETWORK_ID.NETID_HSCAN2);
+            case "HSCAN3":
+                return ((int)eNETWORK_ID.NETID_HSCAN3);
+            case "ISO4":
+                return ((int)eNETWORK_ID.NETID_ISO4);
+            case "LIN2":
+                return ((int)eNETWORK_ID.NETID_LIN2);
+            case "LIN3":
+                return ((int)eNETWORK_ID.NETID_LIN3);
+            case "LIN4":
+                return ((int)eNETWORK_ID.NETID_LIN4);
+            case "LIN5":
+                return ((int)eNETWORK_ID.NETID_LIN5);
+            case "MOST":
+                return ((int)eNETWORK_ID.NETID_MOST);
+            case "CGI":
+                return ((int)eNETWORK_ID.NETID_CGI);
+            case "HSCAN4":
+                return ((int)eNETWORK_ID.NETID_HSCAN4);
+            case "HSCAN5":
+                return ((int)eNETWORK_ID.NETID_HSCAN5);
+            case "UART":
+                return ((int)eNETWORK_ID.NETID_UART);
+            case "UART2":
+                return ((int)eNETWORK_ID.NETID_UART2);
+            case "UART3":
+                return ((int)eNETWORK_ID.NETID_UART3);
+            case "UART4":
+                return ((int)eNETWORK_ID.NETID_UART4);
+            case "SWCAN2":
+                return ((int)eNETWORK_ID.NETID_SWCAN2);
+            case "ETHERNE":
+                return ((int)eNETWORK_ID.NETID_ETHERNET_DAQ);
+            case "FLEXRAY1A":
+                return ((int)eNETWORK_ID.NETID_FLEXRAY1A);
+            case "FLEXRAY1B":
+                return ((int)eNETWORK_ID.NETID_FLEXRAY1B);
+            case "FLEXRAY2A":
+                return ((int)eNETWORK_ID.NETID_FLEXRAY2A);
+            case "FLEXRAY2B":
+                return ((int)eNETWORK_ID.NETID_FLEXRAY2B);
+            case "FLEXRAY":
+                return ((int)eNETWORK_ID.NETID_FLEXRAY);
+            case "MOST25":
+                return ((int)eNETWORK_ID.NETID_MOST25);
+            case "MOST50":
+                return ((int)eNETWORK_ID.NETID_MOST50);
+            case "MOST150":
+                return ((int)eNETWORK_ID.NETID_MOST150);
+            case "ETHERNET":
+                return ((int)eNETWORK_ID.NETID_ETHERNET);
+            case "HSCAN6":
+                return ((int)eNETWORK_ID.NETID_HSCAN6);
+            case "HSCAN7":
+                return ((int)eNETWORK_ID.NETID_HSCAN7);
+            case "LIN6":
+                return ((int)eNETWORK_ID.NETID_LIN6);
+            case "LSFTCAN2":
+                return ((int)eNETWORK_ID.NETID_LSFTCAN2);
+            case "OP_ETHERNET1":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET1);
+            case "OP_ETHERNET2":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET2);
+            case "OP_ETHERNET3":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET3);
+            case "OP_ETHERNET4":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET4);
+            case "OP_ETHERNET5":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET5);
+            case "OP_ETHERNET6":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET6);
+            case "OP_ETHERNET7":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET7);
+            case "OP_ETHERNET8":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET8);
+            case "OP_ETHERNET9":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET9);
+            case "OP_ETHERNET10":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET10);
+            case "OP_ETHERNET11":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET11);
+            case "OP_ETHERNET12":
+                return ((int)eNETWORK_ID.NETID_OP_ETHERNET12);
         }
+        return (-1);
+    }
+
 
         public static string GetStringForNetworkID(Int16 lNetworkID)
         {
             string sTempOutput = "N/A";
             switch (lNetworkID)
             {
-                case (short)eNETWORK_ID.NETID_DEVICE:
-                    sTempOutput = "DEVICE";
-                    break;
-                case (short)eNETWORK_ID.NETID_HSCAN:
-                    sTempOutput = "HSCAN";
-                    break;
-                case (short)eNETWORK_ID.NETID_MSCAN:
-                    sTempOutput = "MSCAN";
-                    break;
-                case (short)eNETWORK_ID.NETID_SWCAN:
-                    sTempOutput = "SWCAN";
-                    break;
-                case (short)eNETWORK_ID.NETID_LSFTCAN:
-                    sTempOutput = "LSFTCAN";
-                    break;
-                case (short)eNETWORK_ID.NETID_FORDSCP:
-                    sTempOutput = "FORDSCP";
-                    break;
-                case (short)eNETWORK_ID.NETID_J1708://No longer Supported
-                    sTempOutput = "J1708";
-                    break;
-                case (short)eNETWORK_ID.NETID_JVPW://No longer Supported
-                    sTempOutput = "JVPW";
-                    break;
-                case (short)eNETWORK_ID.NETID_ISO:
-                    sTempOutput = "ISO";
-                    break;
-                case (short)eNETWORK_ID.NETID_ISO2:
-                    sTempOutput = "ISO2";
-                    break;
-                case (short)eNETWORK_ID.NETID_ISO14230:
-                    sTempOutput = "ISO14230";
-                    break;
-                case (short)eNETWORK_ID.NETID_LIN:
-                    sTempOutput = "LIN";
-                    break;
-                case (short)eNETWORK_ID.NETID_ISO3:
-                    sTempOutput = "ISO3";
-                    break;
-                case (short)eNETWORK_ID.NETID_HSCAN2:
-                    sTempOutput = "HSCAN2";
-                    break;
-                case (short)eNETWORK_ID.NETID_HSCAN3:
-                    sTempOutput = "HSCAN3";
-                    break;
-                case (short)eNETWORK_ID.NETID_ISO4:
-                    sTempOutput = "ISO4";
-                    break;
-                case (short)eNETWORK_ID.NETID_LIN2:
-                    sTempOutput = "LIN2";
-                    break;
-                case (short)eNETWORK_ID.NETID_LIN3:
-                    sTempOutput = "LIN3";
-                    break;
-                case (short)eNETWORK_ID.NETID_LIN4:
-                    sTempOutput = "LIN4";
-                    break;
-                case (short)eNETWORK_ID.NETID_LIN5:
-                    sTempOutput = "LIN5";
-                    break;
-                case (short)eNETWORK_ID.NETID_MOST:
-                    sTempOutput = "MOST";
-                    break;
-                case (short)eNETWORK_ID.NETID_CGI:
-                    sTempOutput = "CGI";
-                    break;
-                case (short)eNETWORK_ID.NETID_HSCAN4:
-                    sTempOutput = "HSCAN4";
-                    break;
-                case (short)eNETWORK_ID.NETID_HSCAN5:
-                    sTempOutput = "HSCAN5";
-                    break;
-                case (short)eNETWORK_ID.NETID_UART:
-                    sTempOutput = "UART";
-                    break;
-                case (short)eNETWORK_ID.NETID_UART2:
-                    sTempOutput = "UART2";
-                    break;
-                case (short)eNETWORK_ID.NETID_UART3:
-                    sTempOutput = "UART3";
-                    break;
-                case (short)eNETWORK_ID.NETID_UART4:
-                    sTempOutput = "UART4";
-                    break;
-                case (short)eNETWORK_ID.NETID_SWCAN2:
-                    sTempOutput = "SWCAN2";
-                    break;
-                case (short)eNETWORK_ID.NETID_ETHERNET_DAQ:
-                    sTempOutput = "ETHERNE";
-                    break;
-                case (short)eNETWORK_ID.NETID_TEXTAPI_TO_HOST:
-                    sTempOutput = "TEXTAP";
-                    break;
-                case (short)eNETWORK_ID.NETID_FLEXRAY1A:
-                    sTempOutput = "FLEXRAY1A";
-                    break;
-                case (short)eNETWORK_ID.NETID_FLEXRAY1B:
-                    sTempOutput = "FLEXRAY1B";
-                    break;
-                case (short)eNETWORK_ID.NETID_FLEXRAY2A:
-                    sTempOutput = "FLEXRAY2A";
-                    break;
-                case (short)eNETWORK_ID.NETID_FLEXRAY2B:
-                    sTempOutput = "FLEXRAY2B";
-                    break;
-                case (short)eNETWORK_ID.NETID_FLEXRAY:
-                    sTempOutput = "FLEXRAY";
-                    break;
-                case (short)eNETWORK_ID.NETID_MOST25:
-                    sTempOutput = "MOST25";
-                    break;
-                case (short)eNETWORK_ID.NETID_MOST50:
-                    sTempOutput = "MOST50";
-                    break;
-                case (short)eNETWORK_ID.NETID_MOST150:
-                    sTempOutput = "MOST150";
-                    break;
-                case (short)eNETWORK_ID.NETID_ETHERNET:
-                    sTempOutput = "ETHERNET";
-                    break;
-                case (short)eNETWORK_ID.NETID_GMFSA:
-                    sTempOutput = "GMFSA";
-                    break;
-                case (short)eNETWORK_ID.NETID_TCP:
-                    sTempOutput = "TCP";
-                    break;
-                case (short)eNETWORK_ID.NETID_HSCAN6:
-                    sTempOutput = "HSCAN6";
-                    break;
-                case (short)eNETWORK_ID.NETID_HSCAN7:
-                    sTempOutput = "HSCAN7";
-                    break;
-                case (short)eNETWORK_ID.NETID_LIN6:
-                    sTempOutput = "LIN6";
-                    break;
-                case (short)eNETWORK_ID.NETID_LSFTCAN2:
-                    sTempOutput = "LSFTCAN2";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET1:
-                    sTempOutput = "OP_ETHERNET1";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET2:
-                    sTempOutput = "OP_ETHERNET2";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET3:
-                    sTempOutput = "OP_ETHERNET3";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET4:
-                    sTempOutput = "OP_ETHERNET4";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET5:
-                    sTempOutput = "OP_ETHERNET5";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET6:
-                    sTempOutput = "OP_ETHERNET6";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET7:
-                    sTempOutput = "OP_ETHERNET7";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET8:
-                    sTempOutput = "OP_ETHERNET8";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET9:
-                    sTempOutput = "OP_ETHERNET9";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET10:
-                    sTempOutput = "OP_ETHERNET10";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET11:
-                    sTempOutput = "OP_ETHERNET11";
-                    break;
-                case (short)eNETWORK_ID.NETID_OP_ETHERNET12:
-                    sTempOutput = "OP_ETHERNET12";
-                    break;
-                default:
-                    sTempOutput = "Other";
-                    break;
+            case (short)eNETWORK_ID.NETID_DEVICE:
+                sTempOutput = "DEVICE";
+                break;
+            case (short)eNETWORK_ID.NETID_HSCAN:
+                sTempOutput = "HSCAN";
+                break;
+            case (short)eNETWORK_ID.NETID_MSCAN:
+                sTempOutput = "MSCAN";
+                break;
+            case (short)eNETWORK_ID.NETID_SWCAN:
+                sTempOutput = "SWCAN";
+                break;
+            case (short)eNETWORK_ID.NETID_LSFTCAN:
+                sTempOutput = "LSFTCAN";
+                break;
+            case (short)eNETWORK_ID.NETID_ISO:
+                sTempOutput = "ISO";
+                break;
+            case (short)eNETWORK_ID.NETID_ISO2:
+                sTempOutput = "ISO2";
+                break;
+            case (short)eNETWORK_ID.NETID_ISO14230:
+                sTempOutput = "ISO14230";
+                break;
+            case (short)eNETWORK_ID.NETID_LIN:
+                sTempOutput = "LIN";
+                break;
+            case (short)eNETWORK_ID.NETID_ISO3:
+                sTempOutput = "ISO3";
+                break;
+            case (short)eNETWORK_ID.NETID_HSCAN2:
+                sTempOutput = "HSCAN2";
+                break;
+            case (short)eNETWORK_ID.NETID_HSCAN3:
+                sTempOutput = "HSCAN3";
+                break;
+            case (short)eNETWORK_ID.NETID_ISO4:
+                sTempOutput = "ISO4";
+                break;
+            case (short)eNETWORK_ID.NETID_LIN2:
+                sTempOutput = "LIN2";
+                break;
+            case (short)eNETWORK_ID.NETID_LIN3:
+                sTempOutput = "LIN3";
+                break;
+            case (short)eNETWORK_ID.NETID_LIN4:
+                sTempOutput = "LIN4";
+                break;
+            case (short)eNETWORK_ID.NETID_LIN5:
+                sTempOutput = "LIN5";
+                break;
+            case (short)eNETWORK_ID.NETID_MOST:
+                sTempOutput = "MOST";
+                break;
+            case (short)eNETWORK_ID.NETID_CGI:
+                sTempOutput = "CGI";
+                break;
+            case (short)eNETWORK_ID.NETID_HSCAN4:
+                sTempOutput = "HSCAN4";
+                break;
+            case (short)eNETWORK_ID.NETID_HSCAN5:
+                sTempOutput = "HSCAN5";
+                break;
+            case (short)eNETWORK_ID.NETID_UART:
+                sTempOutput = "UART";
+                break;
+            case (short)eNETWORK_ID.NETID_UART2:
+                sTempOutput = "UART2";
+                break;
+            case (short)eNETWORK_ID.NETID_UART3:
+                sTempOutput = "UART3";
+                break;
+            case (short)eNETWORK_ID.NETID_UART4:
+                sTempOutput = "UART4";
+                break;
+            case (short)eNETWORK_ID.NETID_SWCAN2:
+                sTempOutput = "SWCAN2";
+                break;
+            case (short)eNETWORK_ID.NETID_ETHERNET_DAQ:
+                sTempOutput = "ETHERNE";
+                break;
+            case (short)eNETWORK_ID.NETID_FLEXRAY1A:
+                sTempOutput = "FLEXRAY1A";
+                break;
+            case (short)eNETWORK_ID.NETID_FLEXRAY1B:
+                sTempOutput = "FLEXRAY1B";
+                break;
+            case (short)eNETWORK_ID.NETID_FLEXRAY2A:
+                sTempOutput = "FLEXRAY2A";
+                break;
+            case (short)eNETWORK_ID.NETID_FLEXRAY2B:
+                sTempOutput = "FLEXRAY2B";
+                break;
+            case (short)eNETWORK_ID.NETID_FLEXRAY:
+                sTempOutput = "FLEXRAY";
+                break;
+            case (short)eNETWORK_ID.NETID_MOST25:
+                sTempOutput = "MOST25";
+                break;
+            case (short)eNETWORK_ID.NETID_MOST50:
+                sTempOutput = "MOST50";
+                break;
+            case (short)eNETWORK_ID.NETID_MOST150:
+                sTempOutput = "MOST150";
+                break;
+            case (short)eNETWORK_ID.NETID_ETHERNET:
+                sTempOutput = "ETHERNET";
+                break;
+            case (short)eNETWORK_ID.NETID_HSCAN6:
+                sTempOutput = "HSCAN6";
+                break;
+            case (short)eNETWORK_ID.NETID_HSCAN7:
+                sTempOutput = "HSCAN7";
+                break;
+            case (short)eNETWORK_ID.NETID_LIN6:
+                sTempOutput = "LIN6";
+                break;
+            case (short)eNETWORK_ID.NETID_LSFTCAN2:
+                sTempOutput = "LSFTCAN2";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET1:
+                sTempOutput = "OP_ETHERNET1";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET2:
+                sTempOutput = "OP_ETHERNET2";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET3:
+                sTempOutput = "OP_ETHERNET3";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET4:
+                sTempOutput = "OP_ETHERNET4";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET5:
+                sTempOutput = "OP_ETHERNET5";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET6:
+                sTempOutput = "OP_ETHERNET6";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET7:
+                sTempOutput = "OP_ETHERNET7";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET8:
+                sTempOutput = "OP_ETHERNET8";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET9:
+                sTempOutput = "OP_ETHERNET9";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET10:
+                sTempOutput = "OP_ETHERNET10";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET11:
+                sTempOutput = "OP_ETHERNET11";
+                break;
+            case (short)eNETWORK_ID.NETID_OP_ETHERNET12:
+                sTempOutput = "OP_ETHERNET12";
+                break;
+            default:
+                sTempOutput = "Other";
+                break;
             }
             return sTempOutput;
         }
-    }
+
+}
 }

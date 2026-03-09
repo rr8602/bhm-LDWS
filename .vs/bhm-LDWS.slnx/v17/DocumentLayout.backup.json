@@ -7,12 +7,20 @@
       "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\udsclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|e:\\\uBC94\uD55C\\bhm-ldws\\bhm-ldws\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-ldws\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-ldws\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|e:\\\uBC94\uD55C\\bhm-ldws\\bhm-ldws\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-ldws\\logger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\logger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-ldws\\icsneoclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40522F91-CB1E-48C1-B40F-15C7B41FC3E4}|bhm-LDWS\\bhm-LDWS.csproj|solutionrelative:bhm-ldws\\icsneoclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -42,6 +50,18 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Logger.cs",
+              "DocumentMoniker": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\Logger.cs",
+              "RelativeDocumentMoniker": "bhm-LDWS\\Logger.cs",
+              "ToolTip": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\Logger.cs",
+              "RelativeToolTip": "bhm-LDWS\\Logger.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADcAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T05:39:59.524Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 2,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml",
@@ -49,19 +69,7 @@
               "ToolTip": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml",
               "RelativeToolTip": "bhm-LDWS\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-02-06T00:30:14.969Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml.cs",
-              "RelativeDocumentMoniker": "bhm-LDWS\\MainWindow.xaml.cs",
-              "ToolTip": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml.cs",
-              "RelativeToolTip": "bhm-LDWS\\MainWindow.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-06T00:30:19.021Z",
+              "WhenOpened": "2026-02-06T00:30:14.969Z",
               "EditorCaption": ""
             },
             {
@@ -72,9 +80,34 @@
               "RelativeDocumentMoniker": "bhm-LDWS\\UDSClient.cs",
               "ToolTip": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\UDSClient.cs",
               "RelativeToolTip": "bhm-LDWS\\UDSClient.cs",
-              "ViewState": "AgIAAHAAAAAAAAAAAAAYwCEAAAA2AAAAAAAAAA==",
+              "ViewState": "AgIAAMEBAAAAAAAAAAAlwNoBAABOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-06T00:29:59.412Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "icsNeoClass.cs",
+              "DocumentMoniker": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\icsNeoClass.cs",
+              "RelativeDocumentMoniker": "bhm-LDWS\\icsNeoClass.cs",
+              "ToolTip": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\icsNeoClass.cs",
+              "RelativeToolTip": "bhm-LDWS\\icsNeoClass.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T07:40:53.51Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "bhm-LDWS\\MainWindow.xaml.cs",
+              "ToolTip": "E:\\\uBC94\uD55C\\bhm-LDWS\\bhm-LDWS\\MainWindow.xaml.cs",
+              "RelativeToolTip": "bhm-LDWS\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAMMBAAAAAAAAAAD4v9QBAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-06T00:30:19.021Z",
               "EditorCaption": ""
             }
           ]

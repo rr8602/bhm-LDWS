@@ -24,6 +24,9 @@ namespace KI_RnB
                 _logger.StartSession("ECU_Test_Session");
                 _client.Logger = _logger;
 
+                // UI 로그 콜백 설정
+                _client.OnLog = (msg) => AppendLog(msg);
+
                 AppendLog("UDS Client initialized successfully.");
                 AppendLog($"[Log] Session started: {_logger.LogFilePath}");
             }
